@@ -1,7 +1,7 @@
 {
-  "name": "mdm-system-backend",
+  "name": "mdm-server",
   "version": "1.0.0",
-  "description": "MDM System for Moveinsync",
+  "description": "Enterprise Mobile Device Management Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

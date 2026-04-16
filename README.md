@@ -91,6 +91,6 @@ JWT_SECRET=your_secret_key
 
 ## 👨‍💻 Author
 
-**[Shraddha Gupta]**
+**You**
 Full Stack Developer
 
