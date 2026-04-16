@@ -40,16 +40,11 @@ import {
   TrendingDown as TrendingDownIcon,
   MoreVert as MoreVertIcon,
   Refresh as RefreshIcon,
-  Download as DownloadIcon,
-  Upload as UploadIcon,
-  Error as ErrorIcon,
-  LocationOn as LocationIcon,
   PhoneAndroid as PhoneIcon,
   Speed as SpeedIcon,
   Timeline as TimelineIcon,
   BarChart as BarChartIcon,
   PieChart as PieChartIcon,
-  Assessment as AssessmentIcon,
 } from '@mui/icons-material';
 import {
   LineChart,
@@ -72,10 +67,8 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  ComposedChart,
-  Scatter,
 } from 'recharts';
-import { devices, versions, schedules, audit, updates } from '../services/api';
+import { devices, schedules, audit, updates } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -108,6 +101,7 @@ function Dashboard() {
     fetchDashboardData();
     const interval = setInterval(fetchDashboardData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange]);
 
   const fetchDashboardData = async () => {
@@ -203,21 +197,7 @@ function Dashboard() {
     return total === 0 ? 100 : Math.round(((total - errors) / total) * 100);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'inactive': return 'default';
-      case 'blocked': return 'error';
-      default: return 'default';
-    }
-  };
 
-  const getVersionHealthColor = (version) => {
-    const latestVersion = stats?.latestVersion || 0;
-    if (version >= latestVersion) return 'success';
-    if (version >= latestVersion - 2) return 'warning';
-    return 'error';
-  };
 
   const handleExportData = () => {
     const dataStr = JSON.stringify({ stats, recentSchedules, versionData, regionData }, null, 2);
