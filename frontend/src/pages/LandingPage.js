@@ -14,15 +14,11 @@ import {
   alpha,
   Divider,
   Paper,
-  Fade,
-  Slide,
 } from '@mui/material';
 import {
-  Menu as MenuIcon,
   ChevronRight as ChevronRightIcon,
   Devices as DevicesIcon,
   Security as SecurityIcon,
-  Speed as SpeedIcon,
   Timeline as TimelineIcon,
   Update as UpdateIcon,
   Analytics as AnalyticsIcon,

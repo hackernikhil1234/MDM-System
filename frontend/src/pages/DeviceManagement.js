@@ -48,16 +48,13 @@ import {
   PhoneAndroid as PhoneAndroidIcon,
   Block as BlockIcon,
   Refresh as RefreshIcon,
-  Timeline as TimelineIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   Schedule as ScheduleIcon,
-  Download as DownloadIcon,
   Upload as UploadIcon,
   Info as InfoIcon,
   LocationOn as LocationIcon,
   BatteryFull as BatteryIcon,
-  Storage as StorageIcon,
   NetworkCheck as NetworkIcon,
   FilterList as FilterListIcon,
   ClearAll as ClearAllIcon,
@@ -96,7 +93,6 @@ function DeviceManagement() {
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
-  const [filterVersion, setFilterVersion] = useState('all');
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [selectedDevices, setSelectedDevices] = useState([]);
   const [bulkActionDialog, setBulkActionDialog] = useState(false);
@@ -111,7 +107,8 @@ function DeviceManagement() {
 
   useEffect(() => {
     fetchDevices();
-  }, [page, rowsPerPage, searchTerm, filterStatus, filterVersion, advancedFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, rowsPerPage, searchTerm, filterStatus, advancedFilters]);
 
   const fetchDevices = async () => {
     try {
@@ -152,7 +149,7 @@ function DeviceManagement() {
 
   const fetchDeviceDetails = async (imei) => {
     try {
-      const [deviceRes, jobsRes, timelineRes] = await Promise.all([
+      const [, jobsRes, timelineRes] = await Promise.all([
         devices.getOne(imei),
         updates.getDeviceHistory(imei),
         audit.getDeviceTimeline(imei)
