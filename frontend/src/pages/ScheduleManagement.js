@@ -202,18 +202,6 @@ function ScheduleManagement() {
     setDetailsDialogOpen(true);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'completed': return 'success';
-      case 'in_progress': return 'info';
-      case 'approved': return 'primary';
-      case 'pending_approval': return 'warning';
-      case 'cancelled': return 'error';
-      case 'failed': return 'error';
-      default: return 'default';
-    }
-  };
-
   const getStatusChipStyle = (status) => {
     switch (status) {
       case 'completed':

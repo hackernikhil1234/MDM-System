@@ -16,24 +16,18 @@ import {
   TextField,
   Alert,
   LinearProgress,
-  Grid,
-  Card,
-  CardContent,
   Switch,
   FormControlLabel,
   Tooltip,
   alpha,
-  useTheme,
-  CircularProgress,
+  Grid,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon,
-  GetApp as GetAppIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
 import { versions } from '../services/api';
@@ -45,7 +39,6 @@ import EmptyState from '../components/EmptyState';
 import StyledDialog from '../components/StyledDialog';
 
 function VersionManagement() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const [versionList, setVersionList] = useState([]);
   const [loading, setLoading] = useState(true);

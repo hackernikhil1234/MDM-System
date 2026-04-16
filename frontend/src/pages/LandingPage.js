@@ -11,7 +11,7 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  useTheme,
+  IconButton,
   alpha,
   Divider,
   Paper,
@@ -36,7 +36,6 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useTheme as useCustomTheme } from '../theme.js';
 
 const features = [
   {
@@ -106,7 +105,6 @@ const testimonials = [
 ];
 
 function LandingPage() {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
