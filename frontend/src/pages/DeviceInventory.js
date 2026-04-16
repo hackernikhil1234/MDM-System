@@ -25,8 +25,7 @@ import {
   Search as SearchIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  PhoneAndroid as PhoneAndroidIcon,
-  Info as InfoIcon
+  PhoneAndroid as PhoneAndroidIcon
 } from '@mui/icons-material';
 import api from '../services/api';
 
@@ -42,6 +41,7 @@ function DeviceInventory() {
 
   useEffect(() => {
     fetchDevices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, searchTerm]);
 
   const fetchDevices = async () => {

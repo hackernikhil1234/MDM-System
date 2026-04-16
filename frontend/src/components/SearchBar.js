@@ -15,8 +15,6 @@ import {
   Box,
   Chip,
   CircularProgress,
-  Divider,
-  alpha,
   useTheme,
 } from '@mui/material';
 import {
@@ -25,7 +23,6 @@ import {
   Devices as DevicesIcon,
   Schedule as ScheduleIcon,
   Update as UpdateIcon,
-  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { devices, schedules, versions } from '../services/api';
@@ -115,6 +112,8 @@ function SearchBar({ open, onClose }) {
         break;
       case 'version':
         navigate(`/versions?code=${item.versionCode}`);
+        break;
+      default:
         break;
     }
   };

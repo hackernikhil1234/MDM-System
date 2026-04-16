@@ -6,7 +6,6 @@ import {
   DialogActions,
   Button,
   CircularProgress,
-  alpha,
 } from '@mui/material';
 
 function StyledDialog({

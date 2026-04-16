@@ -1,0 +1,45 @@
+﻿
+D:\NEWPROJECT\frontend\src\components\Layout.js
+  19:3  warning  'alpha' is defined but never used  no-unused-vars
+
+D:\NEWPROJECT\frontend\src\components\SearchBar.js
+   18:3   warning  'Divider' is defined but never used      no-unused-vars
+   28:14  warning  'HistoryIcon' is defined but never used  no-unused-vars
+  109:5   warning  Expected a default case                  default-case
+
+D:\NEWPROJECT\frontend\src\components\StyledDialog.js
+  9:3  warning  'alpha' is defined but never used  no-unused-vars
+
+D:\NEWPROJECT\frontend\src\pages\AuditTrail.js
+   21:3   warning  'Card' is defined but never used                                                                              no-unused-vars
+   22:3   warning  'CardContent' is defined but never used                                                                       no-unused-vars
+   28:3   warning  'Timeline' is defined but never used                                                                          no-unused-vars
+   29:3   warning  'TimelineItem' is defined but never used                                                                      no-unused-vars
+   30:3   warning  'TimelineSeparator' is defined but never used                                                                 no-unused-vars
+   31:3   warning  'TimelineConnector' is defined but never used                                                                 no-unused-vars
+   32:3   warning  'TimelineContent' is defined but never used                                                                   no-unused-vars
+   33:3   warning  'TimelineDot' is defined but never used                                                                       no-unused-vars
+   34:3   warning  'TimelineOppositeContent' is defined but never used                                                           no-unused-vars
+   38:17  warning  'FilterIcon' is defined but never used                                                                        no-unused-vars
+   70:6   warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  100:9   warning  'sortedLogs' is assigned a value but never used                                                               no-unused-vars
+
+D:\NEWPROJECT\frontend\src\pages\Dashboard.js
+   8:3   warning  'Card' is defined but never used              no-unused-vars
+   9:3   warning  'CardContent' is defined but never used       no-unused-vars
+  23:3   warning  'Stack' is defined but never used             no-unused-vars
+  25:3   warning  'AvatarGroup' is defined but never used       no-unused-vars
+  34:13  warning  'UpdateIcon' is defined but never used        no-unused-vars
+  35:14  warning  'WarningIcon' is defined but never used       no-unused-vars
+  39:17  warning  'TrendingUpIcon' is defined but never used    no-unused-vars
+  40:19  warning  'TrendingDownIcon' is defined but never used  no-unused-vars
+
+D:\NEWPROJECT\frontend\src\pages\DeviceInventory.js
+  29:11  warning  'InfoIcon' is defined but never used                                                                             no-unused-vars
+  45:6   warning  React Hook useEffect has a missing dependency: 'fetchDevices'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\NEWPROJECT\frontend\src\services\socket.js
+  65:1  warning  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+Γ£û 28 problems (0 errors, 28 warnings)
+

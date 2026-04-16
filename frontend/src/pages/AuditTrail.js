@@ -18,24 +18,14 @@ import {
   LinearProgress,
   Alert,
   Grid,
-  Card,
-  CardContent,
   MenuItem,
   FormControl,
   InputLabel,
   Select,
   Tooltip,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  FilterList as FilterIcon,
   History as HistoryIcon,
   Warning as WarningIcon,
   CheckCircle as CheckCircleIcon,
@@ -67,6 +57,7 @@ function AuditTrail() {
 
   useEffect(() => {
     fetchLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, filters]);
 
   const fetchLogs = async () => {
@@ -277,7 +268,7 @@ function AuditTrail() {
                   </TableCell>
                 </TableRow>
               ) : (
-                logs.map((log) => (
+                sortedLogs.map((log) => (
                   <TableRow key={log._id} hover>
                     <TableCell>
                       <Tooltip title={format(new Date(log.timestamp), 'PPpp')}>
