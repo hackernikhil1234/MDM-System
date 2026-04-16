@@ -72,7 +72,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import { motion } from 'framer-motion';
 
 
-const COLORS = ['#1976d2', '#dc004e', '#4caf50', '#ff9800', '#9c27b0', '#00bcd4', '#e91e63'];
+const COLORS = ['#FF6B35', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'];
 
 function Dashboard() {
   const { user } = useAuth();
@@ -310,7 +310,7 @@ function Dashboard() {
                   title="Total Devices"
                   value={stats?.totalActive || 0}
                   icon={<DevicesIcon />}
-                  color="#6366f1"
+                  color="#FF6B35"
                   trend={5.2}
                   subtitle={`${stats?.inactiveDevices || 0} inactive`}
                   onClick={() => navigate('/devices')}
@@ -321,7 +321,7 @@ function Dashboard() {
                   title="Active Schedules"
                   value={recentSchedules.filter(s => s.status === 'in_progress').length}
                   icon={<ScheduleIcon />}
-                  color="#ec4899"
+                  color="#3B82F6"
                   trend={-2.1}
                   subtitle="2 pending approval"
                   onClick={() => navigate('/schedules')}
@@ -332,7 +332,7 @@ function Dashboard() {
                   title="Success Rate"
                   value={`${updateTrends.successRate || 98}%`}
                   icon={<CheckCircleIcon />}
-                  color="#10b981"
+                  color="#10B981"
                   trend={1.5}
                   subtitle="Last 30 days"
                 />
@@ -342,7 +342,7 @@ function Dashboard() {
                   title="Latest Version"
                   value={`v${stats?.latestVersion || '1.0'}`}
                   icon={<VersionIcon />}
-                  color="#f59e0b"
+                  color="#F59E0B"
                   trend={0}
                   subtitle="Released 2 days ago"
                 />
@@ -377,56 +377,59 @@ function Dashboard() {
                     <ResponsiveContainer width="100%" height={350}>
                       {selectedChart === 'line' && (
                         <LineChart data={auditStats}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                          <XAxis dataKey="date" stroke="#71717a" />
-                          <YAxis stroke="#71717a" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                          <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fontSize: 12 }} />
+                          <YAxis stroke="#9CA3AF" tick={{ fontSize: 12 }} />
                           <RechartsTooltip 
                             contentStyle={{ 
-                              backgroundColor: '#111111',
-                              border: '1px solid #27272a',
-                              borderRadius: 8,
+                              backgroundColor: '#FFFFFF',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: 10,
+                              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                             }}
                           />
                           <Legend />
-                          <Line type="monotone" dataKey="updates" stroke="#60a5fa" strokeWidth={2} name="Updates" />
-                          <Line type="monotone" dataKey="devices" stroke="#34d399" strokeWidth={2} name="Devices" />
-                          <Line type="monotone" dataKey="errors" stroke="#ef4444" strokeWidth={2} name="Errors" />
+                          <Line type="monotone" dataKey="updates" stroke="#FF6B35" strokeWidth={2.5} name="Updates" dot={false} />
+                          <Line type="monotone" dataKey="devices" stroke="#10B981" strokeWidth={2.5} name="Devices" dot={false} />
+                          <Line type="monotone" dataKey="errors" stroke="#EF4444" strokeWidth={2.5} name="Errors" dot={false} />
                         </LineChart>
                       )}
                       {selectedChart === 'area' && (
                         <AreaChart data={auditStats}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                          <XAxis dataKey="date" stroke="#71717a" />
-                          <YAxis stroke="#71717a" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                          <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fontSize: 12 }} />
+                          <YAxis stroke="#9CA3AF" tick={{ fontSize: 12 }} />
                           <RechartsTooltip 
                             contentStyle={{ 
-                              backgroundColor: '#111111',
-                              border: '1px solid #27272a',
-                              borderRadius: 8,
+                              backgroundColor: '#FFFFFF',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: 10,
+                              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                             }}
                           />
                           <Legend />
-                          <Area type="monotone" dataKey="updates" stackId="1" stroke="#60a5fa" fill="#60a5fa" fillOpacity={0.3} />
-                          <Area type="monotone" dataKey="devices" stackId="1" stroke="#34d399" fill="#34d399" fillOpacity={0.3} />
-                          <Area type="monotone" dataKey="errors" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
+                          <Area type="monotone" dataKey="updates" stackId="1" stroke="#FF6B35" fill="#FF6B35" fillOpacity={0.15} />
+                          <Area type="monotone" dataKey="devices" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.15} />
+                          <Area type="monotone" dataKey="errors" stackId="1" stroke="#EF4444" fill="#EF4444" fillOpacity={0.15} />
                         </AreaChart>
                       )}
                       {selectedChart === 'bar' && (
                         <BarChart data={auditStats}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                          <XAxis dataKey="date" stroke="#71717a" />
-                          <YAxis stroke="#71717a" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                          <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fontSize: 12 }} />
+                          <YAxis stroke="#9CA3AF" tick={{ fontSize: 12 }} />
                           <RechartsTooltip 
                             contentStyle={{ 
-                              backgroundColor: '#111111',
-                              border: '1px solid #27272a',
-                              borderRadius: 8,
+                              backgroundColor: '#FFFFFF',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: 10,
+                              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                             }}
                           />
                           <Legend />
-                          <Bar dataKey="updates" fill="#60a5fa" />
-                          <Bar dataKey="devices" fill="#34d399" />
-                          <Bar dataKey="errors" fill="#ef4444" />
+                          <Bar dataKey="updates" fill="#FF6B35" radius={[4,4,0,0]} />
+                          <Bar dataKey="devices" fill="#10B981" radius={[4,4,0,0]} />
+                          <Bar dataKey="errors" fill="#EF4444" radius={[4,4,0,0]} />
                         </BarChart>
                       )}
                     </ResponsiveContainer>
@@ -493,7 +496,7 @@ function Dashboard() {
                 <XAxis type="number" />
                 <YAxis dataKey="_id" type="category" width={100} />
                 <RechartsTooltip />
-                <Bar dataKey="count" fill="#1976d2" />
+                <Bar dataKey="count" fill="#FF6B35" radius={[0,4,4,0]} />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
@@ -516,7 +519,7 @@ function Dashboard() {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="System" dataKey="A" stroke="#1976d2" fill="#1976d2" fillOpacity={0.6} />
+                <Radar name="System" dataKey="A" stroke="#FF6B35" fill="#FF6B35" fillOpacity={0.25} />
                 <Legend />
               </RadarChart>
             </ResponsiveContainer>

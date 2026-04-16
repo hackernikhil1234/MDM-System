@@ -16,7 +16,7 @@ import {
   MenuItem,
   Badge,
   Tooltip,
-  useTheme,
+  Chip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -28,12 +28,13 @@ import {
   Logout as LogoutIcon,
   Notifications as NotificationsIcon,
   Search as SearchIcon,
+  Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
-  Info as InfoIcon,
   Error as ErrorIcon,
   DoneAll as DoneAllIcon,
   DeleteSweep as DeleteSweepIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -41,7 +42,7 @@ import { useNotifications } from '../contexts/NotificationContext';
 import SearchBar from './SearchBar';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const drawerWidth = 280;
+const drawerWidth = 270;
 
 function Layout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -49,38 +50,22 @@ function Layout({ children }) {
   const [notificationsEl, setNotificationsEl] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { 
-    notifications, 
-    unreadCount, 
-    markAllAsRead, 
+  const {
+    notifications,
+    unreadCount,
+    markAllAsRead,
     clearNotifications,
-    handleNotificationAction 
+    handleNotificationAction
   } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleNotificationsOpen = (event) => {
-    setNotificationsEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setNotificationsEl(null);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const handleProfileMenuOpen = (e) => setAnchorEl(e.currentTarget);
+  const handleNotificationsOpen = (e) => setNotificationsEl(e.currentTarget);
+  const handleMenuClose = () => { setAnchorEl(null); setNotificationsEl(null); };
+  const handleLogout = () => { logout(); navigate('/login'); };
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -90,359 +75,430 @@ function Layout({ children }) {
     { text: 'Audit Trail', icon: <HistoryIcon />, path: '/audit', adminOnly: true },
   ];
 
-  const filteredMenuItems = menuItems.filter(item => 
+  const filteredMenuItems = menuItems.filter(item =>
     !item.adminOnly || (item.adminOnly && user?.role === 'admin')
   );
 
   const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Toolbar sx={{ px: 3, py: 2 }}>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            fontWeight: 700,
-            background: 'linear-gradient(135deg, #60a5fa 0%, #c084fc 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#FFFFFF' }}>
+      {/* Logo */}
+      <Box sx={{ px: 3, py: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box
+          sx={{
+            width: 42,
+            height: 42,
+            borderRadius: 2.5,
+            background: 'linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 14px rgba(255, 107, 53, 0.35)',
+            flexShrink: 0,
           }}
-          onClick={() => navigate('/')}
         >
-          MDM System
-        </Typography>
-      </Toolbar>
-      
-      <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-      
-      <Box sx={{ p: 3 }}>
+          <DevicesIcon sx={{ color: '#fff', fontSize: 22 }} />
+        </Box>
+        <Box>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              fontSize: '1.15rem',
+              color: '#1A1A2E',
+              lineHeight: 1.2,
+            }}
+            onClick={() => navigate('/')}
+          >
+            MDM<span style={{ color: '#FF6B35' }}>Portal</span>
+          </Typography>
+          <Typography variant="caption" sx={{ color: '#9CA3AF', fontSize: '0.68rem' }}>
+            Device Management
+          </Typography>
+        </Box>
+      </Box>
+
+      <Divider sx={{ borderColor: '#F3F4F6' }} />
+
+      {/* User card */}
+      <Box sx={{ px: 2.5, py: 2.5 }}>
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 2,
-            p: 2,
-            borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            gap: 1.5,
+            p: 1.5,
+            borderRadius: 2.5,
+            background: 'linear-gradient(135deg, #FFF3EF 0%, #FFEDE5 100%)',
+            border: '1px solid rgba(255,107,53,0.15)',
+            cursor: 'pointer',
           }}
+          onClick={handleProfileMenuOpen}
         >
-          <Avatar 
-            sx={{ 
-              bgcolor: 'primary.main',
-              width: 48,
-              height: 48,
-              border: '2px solid rgba(255, 255, 255, 0.1)',
+          <Avatar
+            sx={{
+              bgcolor: '#FF6B35',
+              width: 40,
+              height: 40,
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              border: '2px solid rgba(255,107,53,0.3)',
             }}
           >
             {user?.name?.charAt(0) || 'A'}
           </Avatar>
-          <Box>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ color: '#ffffff' }}>
+          <Box sx={{ flex: 1, overflow: 'hidden' }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, color: '#1A1A2E', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
               {user?.name}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-              {user?.role}
-            </Typography>
+            <Chip
+              label={user?.role || 'admin'}
+              size="small"
+              sx={{
+                height: 18,
+                fontSize: '0.62rem',
+                fontWeight: 700,
+                bgcolor: '#FF6B35',
+                color: '#fff',
+                textTransform: 'capitalize',
+                mt: 0.3,
+              }}
+            />
           </Box>
         </Box>
       </Box>
-      
-      <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-      
-      <List sx={{ flex: 1, px: 2, py: 2 }}>
-        {filteredMenuItems.map((item) => (
-          <motion.div
-            key={item.text}
-            whileHover={{ x: 4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ListItem 
-              button 
-              onClick={() => {
-                navigate(item.path);
-                setMobileOpen(false);
-              }}
-              selected={location.pathname === item.path}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                px: 2,
-                py: 1.5,
-                '&.Mui-selected': {
-                  background: 'linear-gradient(90deg, rgba(96, 165, 250, 0.2) 0%, rgba(192, 132, 252, 0.2) 100%)',
-                  borderLeft: `3px solid ${theme.palette.primary.main}`,
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, rgba(96, 165, 250, 0.3) 0%, rgba(192, 132, 252, 0.3) 100%)',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: '#60a5fa',
-                  },
-                  '& .MuiListItemText-primary': {
-                    color: '#ffffff',
-                    fontWeight: 600,
-                  },
-                },
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.03)',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ 
-                minWidth: 40,
-                color: location.pathname === item.path ? '#60a5fa' : 'rgba(255, 255, 255, 0.5)',
-              }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText 
-                primary={item.text} 
-                primaryTypographyProps={{
-                  fontSize: '0.9rem',
-                  fontWeight: location.pathname === item.path ? 600 : 400,
-                  color: location.pathname === item.path ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
-                }}
-              />
-            </ListItem>
-          </motion.div>
-        ))}
-      </List>
-      
-      <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-      
-      <List sx={{ px: 2, py: 2 }}>
-        <ListItem 
-          button 
+
+      <Divider sx={{ borderColor: '#F3F4F6' }} />
+
+      {/* Navigation */}
+      <Box sx={{ px: 1.5, py: 1.5, flex: 1 }}>
+        <Typography
+          variant="caption"
+          sx={{ px: 1.5, color: '#9CA3AF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.65rem', display: 'block', mb: 1 }}
+        >
+          Main Navigation
+        </Typography>
+        <List disablePadding>
+          {filteredMenuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <motion.div key={item.text} whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
+                <ListItem
+                  button
+                  onClick={() => { navigate(item.path); setMobileOpen(false); }}
+                  sx={{
+                    borderRadius: 2.5,
+                    mb: 0.5,
+                    px: 1.5,
+                    py: 1.1,
+                    position: 'relative',
+                    bgcolor: isActive ? 'rgba(255, 107, 53, 0.08)' : 'transparent',
+                    border: isActive ? '1px solid rgba(255, 107, 53, 0.2)' : '1px solid transparent',
+                    '&:hover': {
+                      bgcolor: isActive ? 'rgba(255, 107, 53, 0.1)' : 'rgba(255, 107, 53, 0.04)',
+                    },
+                  }}
+                >
+                  {isActive && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        left: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: 3,
+                        height: '60%',
+                        bgcolor: '#FF6B35',
+                        borderRadius: '0 4px 4px 0',
+                      }}
+                    />
+                  )}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 38,
+                      color: isActive ? '#FF6B35' : '#9CA3AF',
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{
+                      fontSize: '0.875rem',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#FF6B35' : '#374151',
+                    }}
+                  />
+                </ListItem>
+              </motion.div>
+            );
+          })}
+        </List>
+      </Box>
+
+      <Divider sx={{ borderColor: '#F3F4F6' }} />
+
+      {/* Logout */}
+      <List sx={{ px: 1.5, py: 1.5 }}>
+        <ListItem
+          button
           onClick={handleLogout}
           sx={{
-            borderRadius: 2,
-            px: 2,
-            py: 1.5,
-            color: 'rgba(255, 255, 255, 0.7)',
+            borderRadius: 2.5,
+            px: 1.5,
+            py: 1.1,
+            color: '#6B7280',
             '&:hover': {
-              background: 'rgba(239, 68, 68, 0.1)',
-              color: '#ef4444',
+              bgcolor: 'rgba(239, 68, 68, 0.06)',
+              color: '#EF4444',
+              '& .MuiListItemIcon-root': { color: '#EF4444' },
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
+          <ListItemIcon sx={{ minWidth: 38, color: 'inherit' }}>
             <LogoutIcon />
           </ListItemIcon>
-          <ListItemText primary="Logout" />
+          <ListItemText
+            primary="Logout"
+            primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 500, color: 'inherit' }}
+          />
         </ListItem>
       </List>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#F8F9FA' }}>
+      {/* AppBar */}
       <AppBar
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          backgroundColor: 'rgba(10, 10, 15, 0.8)',
-          backdropFilter: 'blur(10px)',
+          backgroundColor: '#FFFFFF',
+          borderBottom: '1px solid #E5E7EB',
+          boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+          color: '#1A1A2E',
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ px: { xs: 2, sm: 3 }, gap: 1 }}>
           <IconButton
-            color="inherit"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 1, display: { sm: 'none' }, color: '#6B7280' }}
           >
             <MenuIcon />
           </IconButton>
-          
-          <Typography 
-            variant="h6" 
-            noWrap 
-            sx={{ 
-              flexGrow: 1, 
-              color: '#ffffff',
-              fontWeight: 500,
-            }}
-          >
-            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
-          </Typography>
-          
-          <IconButton 
-            color="inherit"
-            onClick={() => setSearchOpen(true)}
-            sx={{ 
-              mr: 1,
-              color: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': { color: '#60a5fa' }
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
-          
-          <IconButton 
-            color="inherit"
-            onClick={handleNotificationsOpen}
-            sx={{ 
-              mr: 1,
-              color: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': { color: '#60a5fa' }
-            }}
-          >
-            <Badge badgeContent={unreadCount} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          
-          <IconButton
-            onClick={handleProfileMenuOpen}
-            sx={{ 
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              '&:hover': { borderColor: '#60a5fa' }
-            }}
-          >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-              {user?.name?.charAt(0) || 'A'}
-            </Avatar>
-          </IconButton>
-          
+
+          {/* Page title */}
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#1A1A2E', fontSize: '1rem' }}>
+              {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#9CA3AF', fontSize: '0.75rem' }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </Typography>
+          </Box>
+
+          {/* Search */}
+          <Tooltip title="Search (⌘K)">
+            <IconButton
+              onClick={() => setSearchOpen(true)}
+              sx={{
+                bgcolor: '#F8F9FA',
+                border: '1px solid #E5E7EB',
+                color: '#6B7280',
+                borderRadius: 2,
+                px: 1.5,
+                gap: 1,
+                '&:hover': { bgcolor: '#FFF3EF', borderColor: '#FF6B35', color: '#FF6B35' },
+              }}
+            >
+              <SearchIcon fontSize="small" />
+              <Typography variant="caption" sx={{ color: 'inherit', fontWeight: 600, display: { xs: 'none', md: 'block' } }}>
+                Search...
+              </Typography>
+            </IconButton>
+          </Tooltip>
+
+          {/* Notifications */}
+          <Tooltip title="Notifications">
+            <IconButton
+              onClick={handleNotificationsOpen}
+              sx={{
+                bgcolor: '#F8F9FA',
+                border: '1px solid #E5E7EB',
+                color: '#6B7280',
+                borderRadius: 2,
+                '&:hover': { bgcolor: '#FFF3EF', borderColor: '#FF6B35', color: '#FF6B35' },
+              }}
+            >
+              <Badge badgeContent={unreadCount} color="error" max={9}>
+                <NotificationsIcon fontSize="small" />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+
+          {/* Profile */}
+          <Tooltip title={user?.name}>
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              sx={{ p: 0.5 }}
+            >
+              <Avatar
+                sx={{
+                  bgcolor: '#FF6B35',
+                  width: 36,
+                  height: 36,
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  border: '2px solid rgba(255,107,53,0.3)',
+                }}
+              >
+                {user?.name?.charAt(0) || 'A'}
+              </Avatar>
+            </IconButton>
+          </Tooltip>
+
+          {/* Profile Menu */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             PaperProps={{
               sx: {
                 mt: 1.5,
                 minWidth: 200,
-                bgcolor: '#111111',
-                border: '1px solid #27272a',
+                borderRadius: 2.5,
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
               }
             }}
           >
-            <MenuItem disabled>
-              <Box>
-                <Typography variant="body2" sx={{ color: '#ffffff' }}>{user?.name}</Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {user?.email}
-                </Typography>
-              </Box>
+            <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #F3F4F6' }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: '#1A1A2E' }}>{user?.name}</Typography>
+              <Typography variant="caption" sx={{ color: '#9CA3AF' }}>{user?.email}</Typography>
+            </Box>
+            <MenuItem onClick={handleMenuClose} sx={{ gap: 1.5, py: 1.2, mt: 0.5 }}>
+              <SettingsIcon fontSize="small" sx={{ color: '#9CA3AF' }} />
+              <Typography variant="body2" fontWeight={500}>Settings</Typography>
             </MenuItem>
-            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-            <MenuItem onClick={handleLogout}>
-              <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
-              Logout
+            <MenuItem onClick={handleLogout} sx={{ gap: 1.5, py: 1.2, color: '#EF4444', mb: 0.5 }}>
+              <LogoutIcon fontSize="small" />
+              <Typography variant="body2" fontWeight={500}>Logout</Typography>
             </MenuItem>
           </Menu>
 
+          {/* Notifications Menu */}
           <Menu
             anchorEl={notificationsEl}
             open={Boolean(notificationsEl)}
             onClose={handleMenuClose}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             PaperProps={{
-              sx: { 
-                width: 400, 
-                maxHeight: 500,
+              sx: {
+                width: 380,
+                maxHeight: 480,
                 mt: 1.5,
-                bgcolor: '#111111',
-                border: '1px solid #27272a',
+                borderRadius: 2.5,
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
               }
             }}
           >
-            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="subtitle2" sx={{ color: '#ffffff' }}>
+            <Box sx={{ px: 2.5, py: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6' }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: '#1A1A2E' }}>
                 Notifications
+                {unreadCount > 0 && (
+                  <Chip label={unreadCount} size="small" sx={{ ml: 1, height: 18, fontSize: '0.65rem', bgcolor: '#FF6B35', color: '#fff', fontWeight: 700 }} />
+                )}
               </Typography>
               <Box>
-                <Tooltip title="Mark all as read">
-                  <IconButton size="small" onClick={markAllAsRead} sx={{ mr: 0.5 }}>
+                <Tooltip title="Mark all read">
+                  <IconButton size="small" onClick={markAllAsRead} sx={{ mr: 0.5, color: '#9CA3AF', '&:hover': { color: '#FF6B35' } }}>
                     <DoneAllIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Clear all">
-                  <IconButton size="small" onClick={clearNotifications}>
+                  <IconButton size="small" onClick={clearNotifications} sx={{ color: '#9CA3AF', '&:hover': { color: '#EF4444' } }}>
                     <DeleteSweepIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Box>
             </Box>
-            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-            
+
             {notifications.length === 0 ? (
-              <Box sx={{ p: 3, textAlign: 'center' }}>
-                <NotificationsIcon sx={{ fontSize: 40, color: 'rgba(255,255,255,0.1)', mb: 1 }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                  No notifications
+              <Box sx={{ py: 6, textAlign: 'center' }}>
+                <NotificationsIcon sx={{ fontSize: 40, color: '#E5E7EB', mb: 1 }} />
+                <Typography variant="body2" sx={{ color: '#9CA3AF', fontWeight: 500 }}>
+                  All caught up!
                 </Typography>
               </Box>
             ) : (
-              notifications.map((notification) => (
-                <MenuItem 
-                  key={notification.id} 
-                  onClick={() => {
-                    handleNotificationAction(notification);
-                    handleMenuClose();
-                  }}
-                  sx={{
-                    py: 2,
-                    backgroundColor: notification.read ? 'transparent' : 'rgba(96, 165, 250, 0.05)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(96, 165, 250, 0.1)',
-                    },
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, width: '100%' }}>
+              notifications.map((notification) => {
+
+                return (
+                  <MenuItem
+                    key={notification.id}
+                    onClick={() => { handleNotificationAction(notification); handleMenuClose(); }}
+                    sx={{
+                      py: 1.5,
+                      px: 2,
+                      alignItems: 'flex-start',
+                      backgroundColor: notification.read ? 'transparent' : 'rgba(255, 107, 53, 0.03)',
+                      borderLeft: notification.read ? 'none' : '3px solid #FF6B35',
+                      '&:hover': { bgcolor: '#FFF3EF' },
+                    }}
+                  >
                     <Avatar
                       sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: notification.type === 'error' ? 'rgba(239, 68, 68, 0.1)' :
-                                 notification.type === 'warning' ? 'rgba(245, 158, 11, 0.1)' :
-                                 notification.type === 'success' ? 'rgba(34, 197, 94, 0.1)' :
-                                 'rgba(96, 165, 250, 0.1)',
-                        color: notification.type === 'error' ? '#ef4444' :
-                               notification.type === 'warning' ? '#f59e0b' :
-                               notification.type === 'success' ? '#22c55e' :
-                               '#60a5fa',
+                        width: 34,
+                        height: 34,
+                        mr: 1.5,
+                        bgcolor:
+                          notification.type === 'error' ? 'rgba(239,68,68,0.1)' :
+                          notification.type === 'warning' ? 'rgba(245,158,11,0.1)' :
+                          notification.type === 'success' ? 'rgba(16,185,129,0.1)' :
+                          'rgba(59,130,246,0.1)',
+                        flexShrink: 0,
                       }}
                     >
-                      {notification.type === 'error' && <ErrorIcon fontSize="small" />}
-                      {notification.type === 'warning' && <WarningIcon fontSize="small" />}
-                      {notification.type === 'success' && <CheckCircleIcon fontSize="small" />}
-                      {notification.type === 'info' && <InfoIcon fontSize="small" />}
+                      {notification.type === 'error' ? <ErrorIcon fontSize="small" sx={{ color: '#EF4444' }} /> :
+                       notification.type === 'warning' ? <WarningIcon fontSize="small" sx={{ color: '#F59E0B' }} /> :
+                       notification.type === 'success' ? <CheckCircleIcon fontSize="small" sx={{ color: '#10B981' }} /> :
+                       <InfoIcon fontSize="small" sx={{ color: '#3B82F6' }} />}
                     </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle2" sx={{ color: '#ffffff', mb: 0.5 }}>
+                    <Box flex={1}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#1A1A2E', fontSize: '0.82rem' }}>
                         {notification.title}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: '#6B7280', display: 'block', lineHeight: 1.5 }}>
                         {notification.message}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <Typography variant="caption" sx={{ color: '#9CA3AF', fontSize: '0.68rem' }}>
                         {new Date(notification.timestamp).toLocaleString()}
                       </Typography>
                     </Box>
                     {!notification.read && (
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          bgcolor: '#60a5fa',
-                          mt: 1,
-                        }}
-                      />
+                      <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#FF6B35', mt: 0.5, flexShrink: 0 }} />
                     )}
-                  </Box>
-                </MenuItem>
-              ))
+                  </MenuItem>
+                );
+              })
             )}
           </Menu>
         </Toolbar>
       </AppBar>
 
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-      >
+      {/* Sidebar */}
+      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -450,12 +506,7 @@ function Layout({ children }) {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              bgcolor: '#0a0a0a',
-              borderRight: '1px solid #27272a',
-            },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, bgcolor: '#FFFFFF', border: 'none', boxShadow: '4px 0 24px rgba(0,0,0,0.08)' },
           }}
         >
           {drawer}
@@ -464,12 +515,7 @@ function Layout({ children }) {
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              bgcolor: '#0a0a0a',
-              borderRight: '1px solid #27272a',
-            },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, bgcolor: '#FFFFFF', borderRight: '1px solid #E5E7EB' },
           }}
           open
         >
@@ -477,26 +523,26 @@ function Layout({ children }) {
         </Drawer>
       </Box>
 
+      {/* Main Content */}
       <Box
         component="main"
-        sx={{ 
-          flexGrow: 1, 
+        sx={{
+          flexGrow: 1,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           minHeight: '100vh',
-          bgcolor: '#0a0a0a',
-          background: 'radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.05) 0%, transparent 50%)',
+          bgcolor: '#F8F9FA',
         }}
       >
         <Toolbar />
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25 }}
           >
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: { xs: 2, sm: 3 } }}>
               {children}
             </Box>
           </motion.div>
