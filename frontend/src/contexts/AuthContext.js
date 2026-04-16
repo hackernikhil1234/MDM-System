@@ -7,7 +7,7 @@ export const useAuth = () => useContext(AuthContext);
 
 // Create a separate axios instance for auth
 const authApi = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },

@@ -7,7 +7,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-auth-token']
@@ -31,7 +31,8 @@ global.redis = {
 console.log('⚠️ Using mock Redis (no actual Redis server needed)');
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/mdm_system')
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/mdm_system';
+mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => {
     console.log('❌ MongoDB connection error:', err.message);
