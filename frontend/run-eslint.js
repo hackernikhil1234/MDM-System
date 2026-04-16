@@ -1,1 +1,0 @@
-const { ESLint } = require('eslint'); (async function main() { const eslint = new ESLint(); const results = await eslint.lintFiles(['src/**/*.js']); const formatter = await eslint.loadFormatter('stylish'); const resultText = formatter.format(results); console.log(resultText); })().catch((error) => { console.error(error); process.exit(1); });
