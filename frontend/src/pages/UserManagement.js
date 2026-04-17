@@ -36,12 +36,6 @@ const roleColors = {
   viewer: { bg: 'rgba(16,185,129,0.08)', text: '#10B981', border: 'rgba(16,185,129,0.3)', icon: <ViewerIcon sx={{ fontSize: 14 }} /> },
 };
 
-const roleIcons = {
-  admin: <AdminIcon sx={{ fontSize: 14 }} />,
-  manager: <ManagerIcon sx={{ fontSize: 14 }} />,
-  viewer: <ViewerIcon sx={{ fontSize: 14 }} />,
-};
-
 function getInitials(name = '') {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 }

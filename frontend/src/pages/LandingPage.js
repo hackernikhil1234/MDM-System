@@ -35,11 +35,9 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
 
 const MotionBox = motion(Box);
-const MotionTypography = motion(Typography);
 
 function LandingPage() {
   const navigate = useNavigate();
-  const theme = useTheme();
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
