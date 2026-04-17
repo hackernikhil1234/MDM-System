@@ -40,7 +40,25 @@ console.log('⚠️ Using mock Redis (no actual Redis server needed)');
 // Connect to MongoDB
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/mdm_system';
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
+  .then(async () => {
+    console.log('✅ Connected to MongoDB');
+    try {
+      const User = require('./models/User');
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount === 0) {
+        await User.create({
+          name: 'System Administrator',
+          email: 'admin@mdmportal.com',
+          password: 'adminPassword123!',
+          role: 'admin',
+          isActive: true
+        });
+        console.log('🎉 Default admin created: admin@mdmportal.com');
+      }
+    } catch (e) {
+      console.error('⚠️ Failed to seed default admin:', e.message);
+    }
+  })
   .catch(err => {
     console.log('❌ MongoDB connection error:', err.message);
     process.exit(1);
