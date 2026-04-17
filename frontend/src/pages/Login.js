@@ -38,8 +38,8 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await login(email, password);
-    if (success) navigate('/dashboard');
+    const result = await login(email, password);
+    if (result?.success) navigate('/dashboard');
   };
 
   const features = [
@@ -346,13 +346,30 @@ function Login() {
             </Button>
           </Box>
 
-          <Divider sx={{ my: 4, color: '#9CA3AF', fontSize: '0.8rem' }}>
+          <Divider sx={{ my: 3 }}>
             <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 500, px: 1 }}>
-              Secure access only
+              New to MDMPortal?
             </Typography>
           </Divider>
 
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => navigate('/register')}
+            sx={{
+              py: 1.6,
+              borderRadius: 2.5,
+              fontWeight: 700,
+              borderColor: '#E5E7EB',
+              color: '#374151',
+              fontSize: '0.95rem',
+              '&:hover': { borderColor: '#FF6B35', color: '#FF6B35', bgcolor: 'rgba(255,107,53,0.04)' },
+            }}
+          >
+            Create an Account
+          </Button>
+
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 3 }}>
             {['256-bit SSL', 'SOC 2', 'GDPR'].map((b) => (
               <Box key={b} sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
                 <CheckCircleIcon sx={{ color: '#10B981', fontSize: 14 }} />

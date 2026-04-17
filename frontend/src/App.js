@@ -9,11 +9,13 @@ import theme from './theme';
 // Pages
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import DeviceManagement from './pages/DeviceManagement';
 import VersionManagement from './pages/VersionManagement';
 import ScheduleManagement from './pages/ScheduleManagement';
 import AuditTrail from './pages/AuditTrail';
+import NotFound from './pages/NotFound';
 import Layout from './components/Layout';
 import PageTransition from './components/PageTransition';
 import LoadingSkeleton from './components/LoadingSkeleton';
@@ -44,6 +46,7 @@ function AppRoutes() {
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       
       {/* Protected routes */}
       <Route
@@ -107,8 +110,8 @@ function AppRoutes() {
         }
       />
       
-      {/* Redirect any unknown routes to landing page */}
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

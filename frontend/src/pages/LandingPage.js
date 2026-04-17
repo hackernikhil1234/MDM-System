@@ -133,7 +133,7 @@ function LandingPage() {
             </Button>
             <Button
               variant="contained"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/register')}
               sx={{
                 background: 'linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%)',
                 boxShadow: '0 4px 14px rgba(255,107,53,0.35)',

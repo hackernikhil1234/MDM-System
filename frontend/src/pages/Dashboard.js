@@ -216,41 +216,65 @@ function Dashboard() {
 
   return (
     <PageTransition>
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      {/* Header with actions */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            MDM Dashboard
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            Welcome back, {user?.name} · {format(new Date(), 'EEEE, MMMM do, yyyy')}
-          </Typography>
-        </Box>
-        
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchDashboardData}
-            disabled={loading}
-          >
-            Refresh
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={handleExportData}
-          >
-            Export
-          </Button>
-          <Tooltip title="More options">
-            <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-              <MoreVertIcon />
-            </IconButton>
-          </Tooltip>
+    <Box sx={{ flexGrow: 1 }}>
+      {/* Premium Header */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #FF6B35 0%, #E55A2B 60%, #CC4E22 100%)',
+          borderRadius: 3,
+          p: { xs: 3, md: 4 },
+          mb: 4,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', bottom: -30, left: -30, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, position: 'relative', zIndex: 1 }}>
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+              <Typography sx={{ fontWeight: 800, color: '#FFFFFF', fontSize: { xs: '1.5rem', md: '2rem' }, lineHeight: 1.2 }}>
+                Welcome back, {user?.name?.split(' ')[0]} 👋
+              </Typography>
+              <Chip
+                label={user?.role || 'viewer'}
+                size="small"
+                sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 700, textTransform: 'capitalize', border: '1px solid rgba(255,255,255,0.3)', fontSize: '0.72rem' }}
+              />
+            </Box>
+            <Typography sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+              {format(new Date(), 'EEEE, MMMM do, yyyy')} · Here's what's happening with your devices
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={fetchDashboardData}
+              disabled={loading}
+              sx={{ borderColor: 'rgba(255,255,255,0.5)', color: '#fff', borderRadius: 2, fontWeight: 600, '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', borderColor: '#fff' } }}
+            >
+              Refresh
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<DownloadIcon />}
+              onClick={handleExportData}
+              sx={{ bgcolor: '#fff', color: '#FF6B35', borderRadius: 2, fontWeight: 700, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', '&:hover': { bgcolor: '#FFF3EF' } }}
+            >
+              Export
+            </Button>
+            <Tooltip title="More options">
+              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.25)' } }}>
+                <MoreVertIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
+
 
       {/* Time range selector menu */}
       <Menu

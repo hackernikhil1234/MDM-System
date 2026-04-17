@@ -5,12 +5,9 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// Create a separate axios instance for auth
 const authApi = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -33,8 +30,8 @@ export const AuthProvider = ({ children }) => {
         headers: { 'x-auth-token': token }
       });
       setUser(response.data.user);
-    } catch (error) {
-      console.error('Token verification failed:', error);
+    } catch (err) {
+      console.error('Token verification failed:', err);
       localStorage.removeItem('token');
     } finally {
       setLoading(false);
@@ -44,47 +41,63 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null);
-      console.log('Attempting login with:', email);
-      
-      // Make sure we're sending the right data format
-      const response = await authApi.post('/auth/login', { 
-        email: email.trim(), 
-        password: password 
+      const response = await authApi.post('/auth/login', {
+        email: email.trim(),
+        password,
       });
-      
-      console.log('Login response:', response.data);
-      
       if (response.data.success) {
-        const { token, user } = response.data;
+        const { token, user: userData } = response.data;
         localStorage.setItem('token', token);
-        setUser(user);
+        setUser(userData);
         return { success: true };
       } else {
-        setError(response.data.error || 'Login failed');
-        return { success: false, error: response.data.error };
+        const msg = response.data.error || 'Login failed';
+        setError(msg);
+        return { success: false, error: msg };
       }
-    } catch (error) {
-      console.error('Login error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
+    } catch (err) {
+      const msg = err.response?.data?.error || err.message || 'Login failed. Please try again.';
+      setError(msg);
+      return { success: false, error: msg };
+    }
+  };
+
+  const register = async ({ name, email, password, organization }) => {
+    try {
+      setError(null);
+      const response = await authApi.post('/auth/register', {
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        organization: organization?.trim() || '',
       });
-      
-      const errorMessage = error.response?.data?.error || 
-                          error.message || 
-                          'Login failed. Please try again.';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+      if (response.data.success) {
+        const { token, user: userData } = response.data;
+        localStorage.setItem('token', token);
+        setUser(userData);
+        return { success: true };
+      } else {
+        const msg = response.data.error || 'Registration failed';
+        setError(msg);
+        return { success: false, error: msg };
+      }
+    } catch (err) {
+      const msg = err.response?.data?.error || err.message || 'Registration failed. Please try again.';
+      setError(msg);
+      return { success: false, error: msg };
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    setError(null);
   };
 
+  const clearError = () => setError(null);
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );
