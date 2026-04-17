@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Device = require('../models/Device');
-const Schedule = require('../models/Schedule');
+const Schedule = require('../models/UpdateSchedule');
 const UpdateJob = require('../models/UpdateJob');
 const AuditLog = require('../models/AuditLog');
-const Version = require('../models/Version');
+const Version = require('../models/AppVersion');
 const auth = require('../middleware/auth');
 
 // GET /api/stats — live dashboard statistics
