@@ -274,6 +274,16 @@ router.post('/:imei/block', auth, async (req, res) => {
     
     // Invalidate cached devices
     await invalidateCache('rpcache:/api/devices*');
+
+    // Fire Real-Time WebSocket payload mirroring physically pushed secure locks
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('admin_command', {
+        action: 'lock',
+        timestamp: new Date().toISOString(),
+        targetImei: device.imei
+      });
+    }
     
     res.json({ success: true, device });
   } catch (error) {

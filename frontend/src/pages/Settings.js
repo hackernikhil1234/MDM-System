@@ -14,6 +14,8 @@ import {
   Save as SaveIcon,
   CheckCircle as CheckCircleIcon,
   Person as PersonIcon,
+  QrCode as QrCodeIcon,
+  Shield as ShieldIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,6 +51,12 @@ export default function Settings() {
   const [pwLoading, setPwLoading] = useState(false);
   const [showPw, setShowPw] = useState({ current: false, new: false, confirm: false });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  
+  // 2FA state
+  const [mfaLoading, setMfaLoading] = useState(false);
+  const [mfaData, setMfaData] = useState(null); // { secret, qr }
+  const [mfaToken, setMfaToken] = useState('');
+  const [mfaEnabled, setMfaEnabled] = useState(user?.twoFactorEnabled || false);
 
   // Notification prefs (UI state only — stored in localStorage)
   const [notifPrefs, setNotifPrefs] = useState(() => {
@@ -87,6 +95,44 @@ export default function Settings() {
       setError(err.response?.data?.error || 'Failed to update password');
     } finally {
       setPwLoading(false);
+    }
+  };
+
+  const handleGenerateMFA = async () => {
+    setMfaLoading(true);
+    setError('');
+    try {
+      const res = await api.get('/auth/2fa/generate', { headers: { 'x-auth-token': token } });
+      setMfaData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to generate 2FA secret');
+    } finally {
+      setMfaLoading(true); // Wait for image load etc if needed, but keeping it true for now
+      setMfaLoading(false);
+    }
+  };
+
+  const handleEnableMFA = async () => {
+    if (mfaToken.length < 6) return;
+    setMfaLoading(true);
+    setError('');
+    try {
+      // We use the same verify-2fa endpoint but it will also enable it in the DB
+      const res = await api.post('/auth/verify-2fa', { 
+        userId: user.id, 
+        token: mfaToken 
+      }, { headers: { 'x-auth-token': token } });
+      
+      if (res.data.success) {
+        setMfaEnabled(true);
+        setMfaData(null);
+        setMfaToken('');
+        setSuccess('Two-factor authentication enabled successfully');
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Invalid verification code');
+    } finally {
+      setMfaLoading(false);
     }
   };
 
@@ -188,6 +234,79 @@ export default function Settings() {
           >
             {pwLoading ? 'Updating...' : 'Update Password'}
           </Button>
+        </Box>
+      </SectionCard>
+
+      {/* Two-Factor Authentication */}
+      <SectionCard 
+        title="Two-Factor Authentication (2FA)" 
+        subtitle="Add an extra layer of security to your account" 
+        icon={<ShieldIcon />}
+      >
+        <Box sx={{ p: 1 }}>
+          {mfaEnabled ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, bgcolor: 'rgba(16,185,129,0.05)', p: 2.5, borderRadius: 2.5, border: '1px solid rgba(16,185,129,0.2)' }}>
+              <CheckCircleIcon sx={{ color: '#10B981', fontSize: 24 }} />
+              <Box>
+                <Typography sx={{ fontWeight: 700, color: '#1A1A2E' }}>2FA is Active</Typography>
+                <Typography variant="caption" sx={{ color: '#6B7280' }}>Your account is protected with an additional verification layer.</Typography>
+              </Box>
+            </Box>
+          ) : mfaData ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ textAlign: 'center', color: '#4B5563' }}>
+                1. Scan this QR code with your authenticator app (e.g., Google Authenticator, Authy):
+              </Typography>
+              <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '1px solid #E5E7EB' }}>
+                <img src={mfaData.qr} alt="2FA QR Code" style={{ width: 180, height: 180, display: 'block' }} />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: 320 }}>
+                <Typography variant="caption" sx={{ color: '#6B7280', mb: 1.5, display: 'block', textAlign: 'center' }}>
+                  2. Enter the 6-digit code from the app to verify:
+                </Typography>
+                <TextField
+                  fullWidth
+                  placeholder="000000"
+                  value={mfaToken}
+                  onChange={(e) => setMfaToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  inputProps={{ style: { textAlign: 'center', letterSpacing: '0.3em', fontWeight: 800 } }}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2.5, bgcolor: '#F9FAFB' } }}
+                />
+                <Button
+                  fullWidth
+                  variant="contained"
+                  disabled={mfaLoading || mfaToken.length < 6}
+                  onClick={handleEnableMFA}
+                  sx={{ mt: 2, py: 1.4, borderRadius: 2.5, fontWeight: 700, background: 'linear-gradient(135deg, #10B981, #059669)' }}
+                >
+                  {mfaLoading ? <CircularProgress size={20} color="inherit" /> : 'Verify & Enable'}
+                </Button>
+                <Button 
+                  fullWidth 
+                  variant="text" 
+                  size="small" 
+                  onClick={() => setMfaData(null)}
+                  sx={{ mt: 1, color: '#9CA3AF' }}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Typography variant="body2" sx={{ color: '#4B5563', lineHeight: 1.6 }}>
+                Two-factor authentication adds an extra layer of security. Once enabled, you'll be required to enter a code from an authenticator app when signing in.
+              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<QrCodeIcon />}
+                onClick={handleGenerateMFA}
+                sx={{ alignSelf: 'flex-start', px: 3, py: 1.2, borderRadius: 2.5, fontWeight: 700, borderColor: '#E5E7EB', color: '#1A1A2E', '&:hover': { borderColor: '#FF6B35', color: '#FF6B35' } }}
+              >
+                Setup Authenticator
+              </Button>
+            </Box>
+          )}
         </Box>
       </SectionCard>
 

@@ -16,6 +16,12 @@ import {
 } from 'recharts';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import Papa from 'papaparse';
+import { Download as DownloadIcon } from '@mui/icons-material';
+import { Button } from '@mui/material';
+import { format } from 'date-fns';
 
 const api = axios.create({ baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api' });
 const ORANGE = '#FF6B35';
@@ -106,16 +112,88 @@ export default function Analytics() {
     { title: 'Versions', value: stats?.activeVersions || 0, subtitle: `v${stats?.latestVersion || '1.0'} latest`, color: '#8B5CF6', icon: <SpeedIcon /> },
   ];
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.setTextColor(ORANGE);
+    doc.text('MDM Enterprise Analytics Report', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor('#6B7280');
+    doc.text(`Generated on: ${format(new Date(), 'MMMM do, yyyy HH:mm')}`, 14, 28);
+    
+    // KPI Table
+    const kpiData = [
+      ['Total Devices', stats?.totalDevices || 0, 'Success Rate', `${stats?.successRate || 0}%`],
+      ['Active Devices', stats?.activeDevices || 0, 'Failed Jobs', stats?.failedJobs || 0],
+      ['Total Schedules', stats?.totalSchedules || 0, 'Active Versions', stats?.activeVersions || 0]
+    ];
+    
+    autoTable(doc, {
+      head: [['Metric', 'Value', 'Security Metric', 'Value']],
+      body: kpiData,
+      startY: 35,
+      theme: 'grid',
+      headStyles: { fillColor: ORANGE },
+    });
+
+    // Regional data
+    const regRows = regionData.map(r => [r.name, r.devices]);
+    doc.text('Regional Distribution', 14, (doc).lastAutoTable.finalY + 15);
+    autoTable(doc, {
+      head: [['Region', 'Device Count']],
+      body: regRows,
+      startY: (doc).lastAutoTable.finalY + 18,
+      theme: 'striped'
+    });
+
+    doc.save(`mdm-analytics-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
+  const exportToCSV = () => {
+    const data = {
+      summary: statCards.map(s => ({ title: s.title, value: s.value, subtitle: s.subtitle })),
+      regions: regionData,
+      dailyStats: dailyData
+    };
+    const csv = Papa.unparse(data.dailyStats); // Exporting daily trend as CSV primary
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `mdm-fleet-stats-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.click();
+  };
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#1A1A2E', fontSize: { xs: '1.5rem', md: '2rem' } }}>
-          Analytics
-        </Typography>
-        <Typography sx={{ color: '#9CA3AF', mt: 0.5 }}>
-          Real-time insights into your device fleet performance
-        </Typography>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: '#1A1A2E', fontSize: { xs: '1.5rem', md: '2rem' } }}>
+            Analytics
+          </Typography>
+          <Typography sx={{ color: '#9CA3AF', mt: 0.5 }}>
+            Real-time insights into your device fleet performance
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={exportToCSV}
+            sx={{ borderRadius: 2.5, textTransform: 'none', fontWeight: 700, borderColor: '#E5E7EB', color: '#374151' }}
+          >
+            CSV
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            onClick={exportToPDF}
+            sx={{ borderRadius: 2.5, textTransform: 'none', fontWeight: 700, background: `linear-gradient(135deg, ${ORANGE}, #E55A2B)` }}
+          >
+            Export Report
+          </Button>
+        </Box>
       </Box>
 
       {/* KPI Cards */}

@@ -33,13 +33,31 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading, error } = useAuth();
+  const [step, setStep] = useState('login'); // 'login' or '2fa'
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [userId, setUserId] = useState(null);
+  const { login, verify2FA, loading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await login(email, password);
-    if (result?.success) navigate('/dashboard');
+    if (result?.success) {
+      if (result.requires2FA) {
+        setStep('2fa');
+        setUserId(result.userId);
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  };
+
+  const handle2FAVerify = async (e) => {
+    e.preventDefault();
+    const result = await verify2FA(userId, twoFactorCode);
+    if (result?.success) {
+      navigate('/dashboard');
+    }
   };
 
   const features = [
@@ -225,10 +243,10 @@ function Login() {
 
           <Box sx={{ mb: 5 }}>
             <Typography variant="h3" sx={{ fontWeight: 800, color: '#1A1A2E', mb: 1, letterSpacing: '-0.02em', fontSize: '2rem' }}>
-              Welcome back
+              {step === 'login' ? 'Welcome back' : 'Verification'}
             </Typography>
             <Typography sx={{ color: '#9CA3AF', fontSize: '1rem' }}>
-              Sign in to your admin dashboard
+              {step === 'login' ? 'Sign in to your admin dashboard' : 'Enter the 6-digit code from your authenticator app'}
             </Typography>
           </Box>
 
@@ -238,136 +256,214 @@ function Login() {
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            <Box>
-              <Typography variant="caption" sx={{ color: '#374151', fontWeight: 600, mb: 0.8, display: 'block' }}>
-                Email Address
-              </Typography>
-              <TextField
-                fullWidth
-                type="email"
-                placeholder="admin@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <EmailIcon sx={{ color: '#9CA3AF', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2.5,
-                    bgcolor: '#F8F9FA',
-                    '& fieldset': { borderColor: '#E5E7EB' },
-                    '&:hover fieldset': { borderColor: '#FF6B35' },
-                    '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: 2 },
-                    '&.Mui-focused': { bgcolor: '#FFFFFF' },
-                  },
-                }}
-              />
-            </Box>
-
-            <Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
-                <Typography variant="caption" sx={{ color: '#374151', fontWeight: 600 }}>
-                  Password
+          {step === 'login' ? (
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              <Box>
+                <Typography variant="caption" sx={{ color: '#374151', fontWeight: 600, mb: 0.8, display: 'block' }}>
+                  Email Address
                 </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ color: '#FF6B35', fontWeight: 600, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                >
-                  Forgot password?
-                </Typography>
+                <TextField
+                  fullWidth
+                  type="email"
+                  placeholder="admin@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailIcon sx={{ color: '#9CA3AF', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2.5,
+                      bgcolor: '#F8F9FA',
+                      '& fieldset': { borderColor: '#E5E7EB' },
+                      '&:hover fieldset': { borderColor: '#FF6B35' },
+                      '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: 2 },
+                      '&.Mui-focused': { bgcolor: '#FFFFFF' },
+                    },
+                  }}
+                />
               </Box>
-              <TextField
+
+              <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
+                  <Typography variant="caption" sx={{ color: '#374151', fontWeight: 600 }}>
+                    Password
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: '#FF6B35', fontWeight: 600, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                  >
+                    Forgot password?
+                  </Typography>
+                </Box>
+                <TextField
+                  fullWidth
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon sx={{ color: '#9CA3AF', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
+                          {showPassword ? <VisibilityOff sx={{ color: '#9CA3AF', fontSize: 18 }} /> : <Visibility sx={{ color: '#9CA3AF', fontSize: 18 }} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2.5,
+                      bgcolor: '#F8F9FA',
+                      '& fieldset': { borderColor: '#E5E7EB' },
+                      '&:hover fieldset': { borderColor: '#FF6B35' },
+                      '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: 2 },
+                      '&.Mui-focused': { bgcolor: '#FFFFFF' },
+                    },
+                  }}
+                />
+              </Box>
+
+              <Button
+                type="submit"
                 fullWidth
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LockIcon sx={{ color: '#9CA3AF', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
-                        {showPassword ? <VisibilityOff sx={{ color: '#9CA3AF', fontSize: 18 }} /> : <Visibility sx={{ color: '#9CA3AF', fontSize: 18 }} />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
+                variant="contained"
+                disabled={loading}
+                endIcon={!loading && <ArrowForwardIcon />}
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2.5,
-                    bgcolor: '#F8F9FA',
-                    '& fieldset': { borderColor: '#E5E7EB' },
-                    '&:hover fieldset': { borderColor: '#FF6B35' },
-                    '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: 2 },
-                    '&.Mui-focused': { bgcolor: '#FFFFFF' },
+                  mt: 1,
+                  py: 1.8,
+                  borderRadius: 2.5,
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%)',
+                  boxShadow: '0 6px 22px rgba(255, 107, 53, 0.4)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #E55A2B 0%, #CC4E22 100%)',
+                    boxShadow: '0 8px 28px rgba(255, 107, 53, 0.5)',
+                    transform: 'translateY(-1px)',
+                  },
+                  '&:disabled': {
+                    background: '#E5E7EB',
+                    boxShadow: 'none',
+                    color: '#9CA3AF',
                   },
                 }}
-              />
+              >
+                {loading ? <CircularProgress size={22} sx={{ color: '#fff' }} /> : 'Sign In'}
+              </Button>
+
+              <Divider sx={{ my: 1 }}>
+                <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 500, px: 1 }}>
+                  New to MDMPortal?
+                </Typography>
+              </Divider>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => navigate('/register')}
+                sx={{
+                  py: 1.6,
+                  borderRadius: 2.5,
+                  fontWeight: 700,
+                  borderColor: '#E5E7EB',
+                  color: '#374151',
+                  fontSize: '0.95rem',
+                  '&:hover': { borderColor: '#FF6B35', color: '#FF6B35', bgcolor: 'rgba(255,107,53,0.04)' },
+                }}
+              >
+                Create an Account
+              </Button>
             </Box>
+          ) : (
+            <Box component="form" onSubmit={handle2FAVerify} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              <Box>
+                <Typography variant="caption" sx={{ color: '#374151', fontWeight: 600, mb: 0.8, display: 'block' }}>
+                  6-Digit OTP Code
+                </Typography>
+                <TextField
+                  fullWidth
+                  placeholder="000000"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  required
+                  autoFocus
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <ShieldIcon sx={{ color: '#9CA3AF', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2.5,
+                      bgcolor: '#F8F9FA',
+                      '& fieldset': { borderColor: '#E5E7EB' },
+                      '&:hover fieldset': { borderColor: '#FF6B35' },
+                      '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: 2 },
+                      '&.Mui-focused': { bgcolor: '#FFFFFF' },
+                    },
+                    '& input': {
+                      fontSize: '1.2rem',
+                      letterSpacing: '0.5em',
+                      textAlign: 'center',
+                    }
+                  }}
+                />
+              </Box>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-              endIcon={!loading && <ArrowForwardIcon />}
-              sx={{
-                mt: 1,
-                py: 1.8,
-                borderRadius: 2.5,
-                fontSize: '1rem',
-                fontWeight: 700,
-                background: 'linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%)',
-                boxShadow: '0 6px 22px rgba(255, 107, 53, 0.4)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #E55A2B 0%, #CC4E22 100%)',
-                  boxShadow: '0 8px 28px rgba(255, 107, 53, 0.5)',
-                  transform: 'translateY(-1px)',
-                },
-                '&:disabled': {
-                  background: '#E5E7EB',
-                  boxShadow: 'none',
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading || twoFactorCode.length < 6}
+                sx={{
+                  mt: 1,
+                  py: 1.8,
+                  borderRadius: 2.5,
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%)',
+                  boxShadow: '0 6px 22px rgba(255, 107, 53, 0.4)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #E55A2B 0%, #CC4E22 100%)',
+                    boxShadow: '0 8px 28px rgba(255, 107, 53, 0.5)',
+                  },
+                }}
+              >
+                {loading ? <CircularProgress size={22} sx={{ color: '#fff' }} /> : 'Verify & Continue'}
+              </Button>
+
+              <Button
+                fullWidth
+                variant="text"
+                onClick={() => {
+                  setStep('login');
+                  clearError();
+                }}
+                sx={{
                   color: '#9CA3AF',
-                },
-              }}
-            >
-              {loading ? <CircularProgress size={22} sx={{ color: '#fff' }} /> : 'Sign In'}
-            </Button>
-          </Box>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 500, px: 1 }}>
-              New to MDMPortal?
-            </Typography>
-          </Divider>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => navigate('/register')}
-            sx={{
-              py: 1.6,
-              borderRadius: 2.5,
-              fontWeight: 700,
-              borderColor: '#E5E7EB',
-              color: '#374151',
-              fontSize: '0.95rem',
-              '&:hover': { borderColor: '#FF6B35', color: '#FF6B35', bgcolor: 'rgba(255,107,53,0.04)' },
-            }}
-          >
-            Create an Account
-          </Button>
+                  fontWeight: 600,
+                  '&:hover': { color: '#FF6B35', bgcolor: 'transparent' }
+                }}
+              >
+                Back to Login
+              </Button>
+            </Box>
+          )}
 
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 3 }}>
             {['256-bit SSL', 'SOC 2', 'GDPR'].map((b) => (

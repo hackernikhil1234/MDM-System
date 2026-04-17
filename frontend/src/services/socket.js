@@ -25,6 +25,11 @@ class SocketService {
       this.notifyListeners('device-status', data);
     });
 
+    this.socket.on('admin_command', (data) => {
+      // Broadcast WebSocket payloads (e.g., instant locks) across the React app globally
+      this.notifyListeners('admin_command', data);
+    });
+
     this.socket.on('schedule-update', (data) => {
       this.notifyListeners('schedule-update', data);
     });

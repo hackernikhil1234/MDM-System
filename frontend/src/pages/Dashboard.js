@@ -67,6 +67,7 @@ import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 import StatsCard from '../components/StatsCard';
+import GlobalMap from '../components/GlobalMap';
 import PageTransition from '../components/PageTransition';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { motion } from 'framer-motion';
@@ -380,6 +381,11 @@ function Dashboard() {
               transition={{ delay: 0.1 }}
             >
               <Grid container spacing={3} sx={{ mb: 4 }}>
+                {/* Global Live Fleet Tracker */}
+                <Grid item xs={12} md={12}>
+                  <GlobalMap devices={stats?.deviceLocations || []} />
+                </Grid>
+
                 {/* Activity Chart */}
                 <Grid item xs={12} md={8}>
                   <Paper sx={{ p: 3 }}>

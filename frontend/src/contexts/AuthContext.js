@@ -46,6 +46,9 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       if (response.data.success) {
+        if (response.data.requires2FA) {
+          return { success: true, requires2FA: true, userId: response.data.userId };
+        }
         const { token, user: userData } = response.data;
         localStorage.setItem('token', token);
         setUser(userData);
@@ -57,6 +60,26 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       const msg = err.response?.data?.error || err.message || 'Login failed. Please try again.';
+      setError(msg);
+      return { success: false, error: msg };
+    }
+  };
+
+  const verify2FA = async (userId, otpToken) => {
+    try {
+      setError(null);
+      const response = await authApi.post('/auth/verify-2fa', { userId, token: otpToken });
+      if (response.data.success) {
+        const { token: jwtToken, user: userData } = response.data;
+        localStorage.setItem('token', jwtToken);
+        setUser(userData);
+        return { success: true };
+      }
+      const msg = response.data.error || '2FA verification failed';
+      setError(msg);
+      return { success: false, error: msg };
+    } catch (err) {
+      const msg = err.response?.data?.error || 'Invalid 2FA code';
       setError(msg);
       return { success: false, error: msg };
     }
@@ -97,7 +120,7 @@ export const AuthProvider = ({ children }) => {
   const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError }}>
+    <AuthContext.Provider value={{ user, loading, error, login, verify2FA, register, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );

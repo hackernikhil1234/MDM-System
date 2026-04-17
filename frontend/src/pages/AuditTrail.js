@@ -37,6 +37,11 @@ import {
 } from '@mui/icons-material';
 import { audit } from '../services/api';
 import { format, formatDistance } from 'date-fns';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import Papa from 'papaparse';
+import { Download as DownloadIcon } from '@mui/icons-material';
+import { Button } from '@mui/material';
 
 function AuditTrail() {
   const [logs, setLogs] = useState([]);
@@ -85,6 +90,55 @@ function AuditTrail() {
       field,
       direction: sortConfig.field === field && sortConfig.direction === 'asc' ? 'desc' : 'asc'
     });
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.text('MDM Enterprise - Audit Compliance Report', 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${format(new Date(), 'yyyy-MM-dd HH:mm:ss')}`, 14, 22);
+    
+    const tableColumn = ["Date", "User", "Action", "Type", "Status"];
+    const tableRows = logs.map(log => [
+      format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm'),
+      log.userName || 'System',
+      log.action,
+      log.entityType,
+      log.status || 'success'
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      theme: 'grid',
+      headStyles: { fillStyle: '#FF6B35' }
+    });
+    
+    doc.save(`mdm-audit-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
+
+  const exportToCSV = () => {
+    const csvData = logs.map(log => ({
+      Timestamp: format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss'),
+      User: log.userName || 'System',
+      Action: log.action,
+      EntityType: log.entityType,
+      EntityId: log.entityId,
+      Status: log.status || 'success',
+      Metadata: JSON.stringify(log.metadata || {})
+    }));
+    
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mdm-audit-logs-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Sort logs

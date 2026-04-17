@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const { authenticator } = require('otplib');
+const qrcode = require('qrcode');
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
+const auth = require('../middleware/auth');
 
 
 // Register first admin (run once)
@@ -112,7 +115,17 @@ router.post('/login', async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
     
-    // Create token
+    // 2FA Intercept
+    if (user.twoFactorEnabled) {
+      return res.json({
+        success: true,
+        requires2FA: true,
+        userId: user.id,
+        message: 'Two-factor authentication required'
+      });
+    }
+
+    // Create token for non-2FA users
     const token = jwt.sign(
       { user: { id: user.id, email: user.email, role: user.role } },
       process.env.JWT_SECRET || 'your-secret-key',
@@ -126,7 +139,7 @@ router.post('/login', async (req, res) => {
       entityId: user.id,
       userId: user.id,
       userName: user.name,
-      metadata: { email: user.email }
+      metadata: { email: user.email, method: 'password_only' }
     });
     
     res.json({
@@ -141,6 +154,78 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Verify 2FA to complete login logic natively
+router.post('/verify-2fa', async (req, res) => {
+  try {
+    const { userId, token: otpToken } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user || (!user.twoFactorEnabled && !user.twoFactorSecret)) {
+      return res.status(400).json({ success: false, error: '2FA verification denied' });
+    }
+
+    const isValid = authenticator.check(otpToken, user.twoFactorSecret);
+    if (!isValid) {
+      return res.status(401).json({ success: false, error: 'Invalid 2FA token' });
+    }
+
+    // Enable 2FA permanently if testing activation
+    if (!user.twoFactorEnabled) {
+      user.twoFactorEnabled = true;
+      await user.save();
+    }
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    const jwtToken = jwt.sign(
+      { user: { id: user.id, email: user.email, role: user.role } },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' }
+    );
+
+    // Secure audit trail
+    await AuditLog.create({
+      action: 'USER_LOGIN',
+      entityType: 'user',
+      entityId: user.id,
+      userId: user.id,
+      userName: user.name,
+      changes: { via_totp: true }
+    });
+
+    res.json({
+      success: true,
+      token: jwtToken,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Generate 2FA Secret for Settings
+router.get('/2fa/generate', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    // Don't override if already secured
+    if (user.twoFactorEnabled) {
+      return res.status(400).json({ success: false, error: '2FA is already fully managed.' });
+    }
+
+    const secret = authenticator.generateSecret();
+    const otpauth = authenticator.keyuri(user.email, 'MDM Enterprise Portal', secret);
+    const imageUrl = await qrcode.toDataURL(otpauth);
+
+    user.twoFactorSecret = secret;
+    await user.save();
+
+    res.json({ success: true, secret, qr: imageUrl });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

@@ -29,6 +29,7 @@ router.get('/', auth, cacheMiddleware(30), async (req, res) => {
       recentAudit,
       devicesByRegion,
       devicesByVersion,
+      deviceLocations
     ] = await Promise.all([
       Device.countDocuments(),
       Device.countDocuments({ status: 'active' }),
@@ -42,6 +43,11 @@ router.get('/', auth, cacheMiddleware(30), async (req, res) => {
       AuditLog.find({ timestamp: { $gte: thirtyDaysAgo } }).sort({ timestamp: -1 }).limit(100).lean(),
       Device.aggregate([{ $group: { _id: '$region', count: { $sum: 1 } } }, { $sort: { count: -1 } }, { $limit: 10 }]),
       Device.aggregate([{ $group: { _id: '$currentVersionCode', count: { $sum: 1 } } }, { $sort: { count: -1 } }, { $limit: 5 }]),
+      // Fetch up to 500 device locations rapidly for the map
+      Device.find(
+        { 'location.lastKnownLatitude': { $exists: true, $ne: null } },
+        'imei status deviceModel deviceOS location'
+      ).limit(500).lean()
     ]);
 
     // Latest version
@@ -95,6 +101,7 @@ router.get('/', auth, cacheMiddleware(30), async (req, res) => {
         devicesByRegion,
         devicesByVersion,
         dailyStats,
+        deviceLocations
       },
     });
   } catch (error) {

@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { updates, schedules } from '../services/api';
+import SocketService from '../services/socket';
 import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
@@ -116,7 +117,32 @@ export const NotificationProvider = ({ children }) => {
 
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+
+    // Initialize WebSockets globally for instant payloads
+    const socketService = new SocketService();
+    const token = localStorage.getItem('token');
+    if (token) socketService.connect(token);
+
+    // Receive the WebSocket hook we built backend side
+    const handleAdminCommand = (data) => {
+      setNotifications(prev => [{
+        id: `ws-${Date.now()}`,
+        type: 'warning',
+        title: 'Security Payload Broadcast',
+        message: `Admin command (${data.action}) executed on IMEI: ${data.targetImei.slice(-4)}`,
+        timestamp: data.timestamp,
+        read: false,
+        actionable: false
+      }, ...prev].slice(0, 20));
+    };
+
+    socketService.subscribe('admin_command', handleAdminCommand);
+
+    return () => {
+      clearInterval(interval);
+      socketService.unsubscribe('admin_command', handleAdminCommand);
+      if (socketService.socket) socketService.socket.disconnect();
+    };
   }, [user]);
 
   const markAsRead = (notificationId) => {

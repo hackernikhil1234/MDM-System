@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const promClient = require('prom-client');
+const http = require('http');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
 const logger = require('./middleware/logger');
@@ -174,8 +176,30 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const httpServer = http.createServer(app);
+
+// Initialize Socket.io
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || '*',
+    methods: ['GET', 'POST']
+  }
+});
+
+io.on('connection', (socket) => {
+  logger.info(`🔌 WebSocket Client connected: ${socket.id}`);
+  
+  socket.on('disconnect', () => {
+    logger.info(`🔌 WebSocket Client disconnected: ${socket.id}`);
+  });
+});
+
+// Expose io locally to all req instances within Express routes
+app.set('io', io);
+
+httpServer.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
+  console.log(`📡 WebSockets Active`);
   console.log(`📝 Test the API:`);
   console.log(`   - Health check: http://localhost:${PORT}/health`);
   console.log(`   - Test route: http://localhost:${PORT}/api/test`);
