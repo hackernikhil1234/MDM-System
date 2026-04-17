@@ -25,6 +25,7 @@ const auditLogSchema = new mongoose.Schema({
       'USER_REGISTERED',
       'USER_CREATED',
       'USER_UPDATED',
+      'USER_ROLE_CHANGED',
       'BULK_UPDATE_SCHEDULED'
     ]
   },

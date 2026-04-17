@@ -15,6 +15,9 @@ import DeviceManagement from './pages/DeviceManagement';
 import VersionManagement from './pages/VersionManagement';
 import ScheduleManagement from './pages/ScheduleManagement';
 import AuditTrail from './pages/AuditTrail';
+import Analytics from './pages/Analytics';
+import UserManagement from './pages/UserManagement';
+import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import Layout from './components/Layout';
 import PageTransition from './components/PageTransition';
@@ -110,6 +113,43 @@ function AppRoutes() {
         }
       />
       
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PageTransition>
+                <Analytics />
+              </PageTransition>
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Layout>
+              <PageTransition>
+                <UserManagement />
+              </PageTransition>
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PageTransition>
+                <Settings />
+              </PageTransition>
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -35,6 +35,8 @@ import {
   DoneAll as DoneAllIcon,
   DeleteSweep as DeleteSweepIcon,
   Settings as SettingsIcon,
+  Analytics as AnalyticsIcon,
+  Group as GroupIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -70,9 +72,12 @@ function Layout({ children }) {
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Devices', icon: <DevicesIcon />, path: '/devices' },
+    { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
     { text: 'Versions', icon: <UpdateIcon />, path: '/versions', adminOnly: true },
     { text: 'Schedules', icon: <ScheduleIcon />, path: '/schedules' },
     { text: 'Audit Trail', icon: <HistoryIcon />, path: '/audit', adminOnly: true },
+    { text: 'Users', icon: <GroupIcon />, path: '/users', adminOnly: true },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
 
   const filteredMenuItems = menuItems.filter(item =>
@@ -384,7 +389,7 @@ function Layout({ children }) {
               <Typography variant="body2" sx={{ fontWeight: 700, color: '#1A1A2E' }}>{user?.name}</Typography>
               <Typography variant="caption" sx={{ color: '#9CA3AF' }}>{user?.email}</Typography>
             </Box>
-            <MenuItem onClick={handleMenuClose} sx={{ gap: 1.5, py: 1.2, mt: 0.5 }}>
+            <MenuItem onClick={() => { navigate('/settings'); handleMenuClose(); }} sx={{ gap: 1.5, py: 1.2, mt: 0.5 }}>
               <SettingsIcon fontSize="small" sx={{ color: '#9CA3AF' }} />
               <Typography variant="body2" fontWeight={500}>Settings</Typography>
             </MenuItem>

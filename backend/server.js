@@ -54,6 +54,7 @@ const scheduleRoutes = require('./routes/schedules');
 const updateRoutes = require('./routes/updates');
 const auditRoutes = require('./routes/audit');
 const statsRoutes = require('./routes/stats');
+const userRoutes = require('./routes/users');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -63,6 +64,7 @@ app.use('/api/schedules', scheduleRoutes);
 app.use('/api/updates', updateRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
