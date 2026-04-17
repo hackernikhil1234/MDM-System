@@ -344,7 +344,7 @@ function ScheduleManagement() {
         </Grid>
 
         {/* Schedules Table */}
-        <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: '#111111', border: '1px solid #27272a' }}>
+        <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: '#111111', border: '1px solid #27272a', colorScheme: 'dark' }} className="dark-container">
           <TableContainer>
             <Table>
               <TableHead>

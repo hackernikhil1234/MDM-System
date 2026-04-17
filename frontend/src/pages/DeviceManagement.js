@@ -321,7 +321,9 @@ function DeviceManagement() {
                     sx: {
                       bgcolor: '#111111',
                       border: '1px solid #27272a',
-                    }
+                      colorScheme: 'dark',
+                    },
+                    className: 'dark-container'
                   }
                 }
               }}
@@ -396,7 +398,9 @@ function DeviceManagement() {
               bgcolor: '#111111',
               border: '1px solid #27272a',
               boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-            }
+              colorScheme: 'dark',
+            },
+            className: 'dark-container'
           }}
         >
           <Box sx={{ p: 3 }}>
@@ -539,7 +543,7 @@ function DeviceManagement() {
         )}
 
         {/* Search Bar */}
-        <Paper sx={{ p: 2, mb: 3, bgcolor: '#111111', border: '1px solid #27272a' }}>
+        <Paper sx={{ p: 2, mb: 3, bgcolor: '#111111', border: '1px solid #27272a', colorScheme: 'dark' }} className="dark-container">
           <TextField
             fullWidth
             variant="outlined"
@@ -590,7 +594,7 @@ function DeviceManagement() {
             }}
           />
         ) : viewMode === 'table' ? (
-          <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: '#111111', border: '1px solid #27272a' }}>
+          <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: '#111111', border: '1px solid #27272a', colorScheme: 'dark' }} className="dark-container">
             <TableContainer>
               <Table>
                 <TableHead>
@@ -967,7 +971,7 @@ function DeviceManagement() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card sx={{ height: '100%', bgcolor: '#111111', border: '1px solid #27272a' }}>
+                  <Card sx={{ height: '100%', bgcolor: '#111111', border: '1px solid #27272a', colorScheme: 'dark' }} className="dark-container">
                     <CardContent>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                         <Chip
