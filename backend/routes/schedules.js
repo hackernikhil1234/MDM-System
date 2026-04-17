@@ -6,6 +6,8 @@ const Device = require('../models/Device');
 const AppVersion = require('../models/AppVersion');
 const auth = require('../middleware/auth');
 const AuditLog = require('../models/AuditLog');
+const { publishUpdate } = require('../services/queue');
+const logger = require('../middleware/logger');
 
 // Create new schedule
 router.post('/', auth, async (req, res) => {
@@ -410,9 +412,12 @@ async function createUpdateJobs(schedule, query) {
       });
       job.updateState('scheduled');
       await job.save();
-      
-      // In production, trigger push notification here
-      console.log(`Job created for device ${device.imei}`);
+      // Trigger heavily scaled background job instead of blocking Node.js
+      await publishUpdate({
+        scheduleId: schedule._id,
+        deviceImei: device.imei
+      }).catch(err => logger.error(`Queue inject fail for ${device.imei}`, err));
+
     }
   }
 }

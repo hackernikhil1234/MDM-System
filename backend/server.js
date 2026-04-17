@@ -1,9 +1,55 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const promClient = require('prom-client');
 require('dotenv').config();
 
+const logger = require('./middleware/logger');
+const { apiLimiter } = require('./middleware/rateLimiter');
+
 const app = express();
+
+// Initialize Prometheus metrics collection
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+
+// Custom Prometheus HTTP duration metric
+const httpRequestTimer = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.1, 0.3, 0.5, 1, 1.5, 5]
+});
+register.registerMetric(httpRequestTimer);
+
+// Prometheus metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
+// Middleware
+// 1. Security Headers
+app.use(helmet());
+
+// 2. Data Sanitization (NoSQL injection & XSS prevention)
+app.use(xss());
+
+// 3. Rate Limiting (Applied strictly to /api)
+app.use('/api/', apiLimiter);
+
+// 4. Request Logging to Winston & metrics tracking
+app.use((req, res, next) => {
+  const startEpoch = Date.now();
+  res.on('finish', () => {
+    const responseTimeInMs = Date.now() - startEpoch;
+    httpRequestTimer.labels(req.method, req.route ? req.route.path : req.path, res.statusCode).observe(responseTimeInMs / 1000);
+    logger.info(`${req.method} ${req.originalUrl} [${res.statusCode}] - ${responseTimeInMs}ms`);
+  });
+  next();
+});
 
 // Middleware
 app.use(cors({
@@ -22,20 +68,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Simple request logging
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
-
-// Mock Redis for development (comment out actual Redis connection)
-global.redis = {
-  get: async (key) => null,
-  set: async (key, value) => {},
-  del: async (key) => {}
-};
-
-console.log('⚠️ Using mock Redis (no actual Redis server needed)');
+// Mock Redis removed - logic mapped to middleware/cache.js natively
 
 // Connect to MongoDB
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/mdm_system';

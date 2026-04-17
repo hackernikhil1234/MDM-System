@@ -60,4 +60,9 @@ deviceSchema.pre('save', function(next) {
   next();
 });
 
+// Enterprise Data Indexes
+deviceSchema.index({ status: 1, lastOpenTime: -1 });
+deviceSchema.index({ 'location.region': 1, status: 1 });
+deviceSchema.index({ appVersion: 1, appVersionCode: -1 });
+
 module.exports = mongoose.model('Device', deviceSchema);

@@ -6,9 +6,10 @@ const UpdateSchedule = require('../models/UpdateSchedule');
 const UpdateJob = require('../models/UpdateJob');
 const auth = require('../middleware/auth');
 const AuditLog = require('../models/AuditLog');
+const { cacheMiddleware, invalidateCache } = require('../middleware/cache');
 
 // Get all devices with filters
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, cacheMiddleware(30), async (req, res) => {
   try {
     const { 
       region, 
@@ -271,6 +272,9 @@ router.post('/:imei/block', auth, async (req, res) => {
       changes: { status: 'blocked' }
     });
     
+    // Invalidate cached devices
+    await invalidateCache('rpcache:/api/devices*');
+    
     res.json({ success: true, device });
   } catch (error) {
     console.error('Block device error:', error);
@@ -383,6 +387,9 @@ router.post('/bulk-update', auth, async (req, res) => {
         targetVersion: targetVersionCode 
       }
     });
+
+    // Invalidate cached devices as statuses might have changed
+    await invalidateCache('rpcache:/api/devices*');
 
     res.json({
       success: true,

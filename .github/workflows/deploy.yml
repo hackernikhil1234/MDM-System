@@ -1,0 +1,38 @@
+name: Enterprise CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Backend Dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Build Frontend Application
+        run: npm run build
+        working-directory: ./frontend
+
+  deploy-render:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Trigger Render Backend Deploy Webhook
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}

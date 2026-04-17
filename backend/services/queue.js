@@ -1,35 +1,36 @@
 const Queue = require('bull');
+const logger = require('../middleware/logger');
 
-const updateQueue = new Queue('updates', process.env.REDIS_URL);
+// We use the same Redis instance as the cache
+const REDIS_URL = process.env.REDIS_URL || process.env.MONGO_URI ? (process.env.REDIS_URL || `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`) : 'redis://127.0.0.1:6379';
 
-// Process update jobs
-updateQueue.process(async (job) => {
-  const { deviceImei, updateId, fromVersion, toVersion } = job.data;
-  
-  // Simulate update process
-  await job.progress(10);
-  
-  // Send push notification
-  await sendPushNotification(deviceImei, {
-    type: 'UPDATE_AVAILABLE',
-    version: toVersion
-  });
-  
-  await job.progress(50);
-  
-  // Wait for device response
-  await new Promise(resolve => setTimeout(resolve, 30000));
-  
-  await job.progress(100);
-  
-  return { success: true, deviceImei, updateId };
+const updateQueue = new Queue('device-updates', REDIS_URL, {
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000 // 5s, 25s, 125s...
+    },
+    removeOnComplete: true
+  }
 });
 
-// Add job to queue
-exports.scheduleUpdate = async (data) => {
-  return await updateQueue.add(data, {
-    attempts: 3,
-    backoff: 5000,
-    removeOnComplete: true
-  });
+updateQueue.on('error', (err) => {
+  logger.error('Queue Error', err);
+});
+
+updateQueue.on('failed', (job, err) => {
+  logger.error(`Job failed for Device ${job.data.deviceImei}`, err);
+});
+
+const publishUpdate = async (jobData) => {
+  try {
+    await updateQueue.add(jobData);
+    logger.info(`Message added to queue: Update for IMEI ${jobData.deviceImei}`);
+  } catch (error) {
+    logger.error('Failed to add message to queue', error);
+    throw error;
+  }
 };
+
+module.exports = { updateQueue, publishUpdate };

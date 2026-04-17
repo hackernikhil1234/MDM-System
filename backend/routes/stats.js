@@ -6,9 +6,11 @@ const UpdateJob = require('../models/UpdateJob');
 const AuditLog = require('../models/AuditLog');
 const Version = require('../models/AppVersion');
 const auth = require('../middleware/auth');
+const { cacheMiddleware } = require('../middleware/cache');
 
 // GET /api/stats — live dashboard statistics
-router.get('/', auth, async (req, res) => {
+// Cached for 30 seconds to massively reduce aggregate DB load
+router.get('/', auth, cacheMiddleware(30), async (req, res) => {
   try {
     const now = new Date();
     const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
