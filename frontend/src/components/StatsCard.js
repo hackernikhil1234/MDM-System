@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Avatar } from '@mui/material';
 import { motion } from 'framer-motion';
 
-function StatsCard({ title, value, icon, color = '#FF6B35', subtitle, trend, trendValue }) {
+function StatsCard({ title, value, icon, color = '#FF6B35', subtitle, trend, trendValue, pulse = false }) {
   const isPositive = trendValue > 0;
 
   return (
@@ -46,19 +46,29 @@ function StatsCard({ title, value, icon, color = '#FF6B35', subtitle, trend, tre
         />
 
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <Box>
-            <Typography
-              variant="caption"
-              sx={{
-                color: '#9CA3AF',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontSize: '0.7rem',
-              }}
-            >
-              {title}
-            </Typography>
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#9CA3AF',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  fontSize: '0.7rem',
+                }}
+              >
+                {title}
+              </Typography>
+              {pulse && (
+                <Box
+                  component={motion.div}
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0.3, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: color }}
+                />
+              )}
+            </Box>
             <Typography
               variant="h4"
               sx={{

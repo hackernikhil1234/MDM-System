@@ -339,6 +339,7 @@ function Dashboard() {
                   trend={5.2}
                   subtitle={`${stats?.inactiveDevices || 0} inactive`}
                   onClick={() => navigate('/devices')}
+                  pulse={true}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
@@ -350,6 +351,7 @@ function Dashboard() {
                   trend={-2.1}
                   subtitle="2 pending approval"
                   onClick={() => navigate('/schedules')}
+                  pulse={true}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>

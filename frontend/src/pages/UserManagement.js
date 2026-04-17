@@ -31,9 +31,9 @@ const api = axios.create({
 });
 
 const roleColors = {
-  admin: { bg: '#FFF3EF', text: '#FF6B35', border: 'rgba(255,107,53,0.3)' },
-  manager: { bg: '#EFF6FF', text: '#3B82F6', border: 'rgba(59,130,246,0.3)' },
-  viewer: { bg: '#F0FDF4', text: '#10B981', border: 'rgba(16,185,129,0.3)' },
+  admin: { bg: 'rgba(255,107,53,0.08)', text: '#FF6B35', border: 'rgba(255,107,53,0.3)', icon: <AdminIcon sx={{ fontSize: 14 }} /> },
+  manager: { bg: 'rgba(59,130,246,0.08)', text: '#3B82F6', border: 'rgba(59,130,246,0.3)', icon: <ManagerIcon sx={{ fontSize: 14 }} /> },
+  viewer: { bg: 'rgba(16,185,129,0.08)', text: '#10B981', border: 'rgba(16,185,129,0.3)', icon: <ViewerIcon sx={{ fontSize: 14 }} /> },
 };
 
 const roleIcons = {
@@ -250,11 +250,18 @@ export default function UserManagement() {
                         </Box>
                       </TableCell>
                       <TableCell>
-                        <Chip
-                          icon={roleIcons[u.role]}
-                          label={u.role}
-                          size="small"
-                          sx={{ bgcolor: rc.bg, color: rc.text, border: `1px solid ${rc.border}`, fontWeight: 700, textTransform: 'capitalize', fontSize: '0.75rem' }}
+                        <Chip 
+                          icon={rc.icon}
+                          label={u.role.toUpperCase()} 
+                          size="small" 
+                          sx={{ 
+                            bgcolor: rc.bg, 
+                            color: rc.text, 
+                            fontWeight: 800, 
+                            fontSize: '0.65rem',
+                            border: `1px solid ${rc.border}`,
+                            '& .MuiChip-icon': { color: 'inherit' }
+                          }} 
                         />
                       </TableCell>
                       <TableCell>

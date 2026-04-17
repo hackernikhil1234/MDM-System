@@ -11,13 +11,40 @@ export default function NotFound() {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: '#F8F9FA',
+        bgcolor: '#ffffff',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         p: 3,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* Mesh Gradient Background */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: -200,
+          right: -200,
+          width: 600,
+          height: 600,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,107,53,0.08) 0%, rgba(255,255,255,0) 70%)',
+          zIndex: 0,
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: -200,
+          left: -200,
+          width: 700,
+          height: 700,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(59,130,246,0.05) 0%, rgba(255,255,255,0) 70%)',
+          zIndex: 0,
+        }}
+      />
       <Container maxWidth="sm">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
