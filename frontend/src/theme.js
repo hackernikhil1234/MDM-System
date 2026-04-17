@@ -330,12 +330,19 @@ const theme = createTheme({
               borderColor: '#FF6B35',
               borderWidth: 2,
             },
+            '&.Mui-disabled fieldset': {
+              borderColor: '#F3F4F6',
+            },
           },
           '& .MuiInputLabel-root': {
-            color: '#9CA3AF',
+            color: '#6B7280', // Slightly darker for better visibility
             '&.Mui-focused': {
               color: '#FF6B35',
             },
+          },
+          '& .MuiFormHelperText-root': {
+            color: '#9CA3AF',
+            fontSize: '0.75rem',
           },
         },
       },

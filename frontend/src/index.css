@@ -122,3 +122,29 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Dark container helper to fix native element visibility */
+.dark-container {
+  color-scheme: dark;
+}
+
+/* Fix visibility of date/time picker icons in Chrome/Edge/Firefox */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.8) brightness(50%) sepia(100%) saturate(5) hue-rotate(10deg);
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Ensure placeholder text is visible on dark backgrounds if color-scheme isn't enough */
+.dark-container input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}

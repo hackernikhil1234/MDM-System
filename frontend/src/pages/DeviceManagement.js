@@ -1127,7 +1127,9 @@ function DeviceManagement() {
             sx: {
               bgcolor: '#111111',
               border: '1px solid #27272a',
-            }
+              colorScheme: 'dark',
+            },
+            className: 'dark-container'
           }}
         >
           <DialogTitle sx={{ pb: 2, color: '#ffffff' }}>Block Device</DialogTitle>
@@ -1168,7 +1170,9 @@ function DeviceManagement() {
             sx: {
               bgcolor: '#111111',
               border: '1px solid #27272a',
-            }
+              colorScheme: 'dark',
+            },
+            className: 'dark-container'
           }}
         >
           <DialogTitle sx={{ color: '#ffffff' }}>Bulk Update</DialogTitle>

@@ -597,7 +597,9 @@ function ScheduleManagement() {
             sx: {
               bgcolor: '#111111',
               border: '1px solid #27272a',
-            }
+              colorScheme: 'dark',
+            },
+            className: 'dark-container'
           }}
         >
           <DialogTitle sx={{ color: '#ffffff', borderBottom: '1px solid #27272a' }}>
@@ -810,7 +812,9 @@ function ScheduleManagement() {
             sx: {
               bgcolor: '#111111',
               border: '1px solid #27272a',
-            }
+              colorScheme: 'dark',
+            },
+            className: 'dark-container'
           }}
         >
           <DialogTitle sx={{ color: '#ffffff' }}>Delete Schedule</DialogTitle>
@@ -852,7 +856,9 @@ function ScheduleManagement() {
             sx: {
               bgcolor: '#111111',
               border: '1px solid #27272a',
-            }
+              colorScheme: 'dark',
+            },
+            className: 'dark-container'
           }}
         >
           {selectedSchedule && (

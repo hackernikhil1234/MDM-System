@@ -35,7 +35,9 @@ function StyledDialog({
           border: '1px solid #27272a',
           borderRadius: 2,
           boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-        }
+          colorScheme: 'dark',
+        },
+        className: 'dark-container'
       }}
     >
       {title && (
