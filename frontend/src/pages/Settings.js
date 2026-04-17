@@ -17,10 +17,8 @@ import {
   QrCode as QrCodeIcon,
   Shield as ShieldIcon,
 } from '@mui/icons-material';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-
-const api = axios.create({ baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api' });
 
 const SectionCard = ({ title, subtitle, icon, children }) => (
   <Card sx={{ borderRadius: 3, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: '1px solid #F3F4F6', mb: 3 }}>

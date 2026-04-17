@@ -22,13 +22,9 @@ import {
   Lock as LockIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
-
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
-});
 
 const roleColors = {
   admin: { bg: 'rgba(255,107,53,0.08)', text: '#FF6B35', border: 'rgba(255,107,53,0.3)', icon: <AdminIcon sx={{ fontSize: 14 }} /> },

@@ -14,16 +14,14 @@ import {
   LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar,
 } from 'recharts';
-import axios from 'axios';
+import api from '../services/api';
 import { motion } from 'framer-motion';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { format } from 'date-fns';
-
-const api = axios.create({ baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api' });
 const ORANGE = '#FF6B35';
 const COLORS = [ORANGE, '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444'];
 
@@ -129,7 +127,7 @@ export default function Analytics() {
       ['Total Schedules', stats?.totalSchedules || 0, 'Active Versions', stats?.activeVersions || 0]
     ];
     
-    autoTable(doc, {
+    doc.autoTable({
       head: [['Metric', 'Value', 'Security Metric', 'Value']],
       body: kpiData,
       startY: 35,
@@ -140,7 +138,7 @@ export default function Analytics() {
     // Regional data
     const regRows = regionData.map(r => [r.name, r.devices]);
     doc.text('Regional Distribution', 14, (doc).lastAutoTable.finalY + 15);
-    autoTable(doc, {
+    doc.autoTable({
       head: [['Region', 'Device Count']],
       body: regRows,
       startY: (doc).lastAutoTable.finalY + 18,
