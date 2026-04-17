@@ -37,8 +37,8 @@ import {
 } from '@mui/icons-material';
 import { audit } from '../services/api';
 import { format, formatDistance } from 'date-fns';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { Button } from '@mui/material';
@@ -107,12 +107,12 @@ function AuditTrail() {
       log.status || 'success'
     ]);
 
-    autoTable(doc, {
+    doc.autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 30,
       theme: 'grid',
-      headStyles: { fillStyle: '#FF6B35' }
+      headStyles: { fillColor: '#FF6B35' }
     });
     
     doc.save(`mdm-audit-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
