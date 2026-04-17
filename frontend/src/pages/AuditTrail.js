@@ -190,9 +190,31 @@ function AuditTrail() {
   return (
     <PageTransition>
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Audit Trail
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: '#1A1A2E' }}>
+          Audit Trail
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<DownloadIcon />}
+            onClick={exportToCSV}
+            sx={{ borderRadius: 2, fontWeight: 600, borderColor: '#E5E7EB', color: '#374151' }}
+          >
+            Export CSV
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<DownloadIcon />}
+            onClick={exportToPDF}
+            sx={{ bgcolor: '#FF6B35', borderRadius: 2, fontWeight: 700, '&:hover': { bgcolor: '#E55A2B' } }}
+          >
+            Download PDF
+          </Button>
+        </Box>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>

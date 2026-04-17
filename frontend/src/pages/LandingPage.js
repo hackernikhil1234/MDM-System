@@ -4,15 +4,12 @@ import {
   Typography,
   Button,
   Grid,
-  Card,
   Container,
   Chip,
   AppBar,
   Toolbar,
   Avatar,
   IconButton,
-  Tooltip,
-  useTheme,
   alpha,
   Divider,
 } from '@mui/material';
@@ -22,9 +19,7 @@ import {
   Timeline as TimelineIcon,
   Update as UpdateIcon,
   Analytics as AnalyticsIcon,
-  CloudSync as CloudSyncIcon,
   ArrowForward as ArrowForwardIcon,
-  CheckCircle as CheckCircleIcon,
   Language as LanguageIcon,
   Bolt as BoltIcon,
   Public as PublicIcon,
@@ -32,7 +27,6 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import PageTransition from '../components/PageTransition';
 
 const MotionBox = motion(Box);
 
