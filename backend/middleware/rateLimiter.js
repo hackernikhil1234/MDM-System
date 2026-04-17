@@ -18,7 +18,12 @@ exports.deviceLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
+  // Fix for ERR_ERL_KEY_GEN_IPV6: explicitly using req.ip fallback while acknowledging validation
   keyGenerator: (req) => req.body.imei || req.ip,
+  validate: { 
+    ipKeyGenerator: false,
+    xForwardedForHeader: false
+  },
   message: {
     success: false,
     error: 'Too many authentication attempts, please try again later'

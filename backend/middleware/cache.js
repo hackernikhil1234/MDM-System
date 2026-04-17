@@ -5,9 +5,9 @@ const logger = require('./logger');
 let client;
 
 // We connect only if REDIS_URL is provided to gracefully handle local/test environments
-if (process.env.REDIS_URL || process.env.REDIS_HOST) {
+if (process.env.REDIS_URL) {
   client = redis.createClient({
-    url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+    url: process.env.REDIS_URL
   });
 
   client.on('error', (err) => logger.error('Redis Client Error', err));
@@ -18,7 +18,7 @@ if (process.env.REDIS_URL || process.env.REDIS_HOST) {
     client = null;
   });
 } else {
-  logger.warn('⚠️ No REDIS_URL provided. Cache layer is effectively disabled.');
+  logger.warn('⚠️ No REDIS_URL provided. Cache layer remains disabled.');
 }
 
 // Generate unique cache keys based on query and route

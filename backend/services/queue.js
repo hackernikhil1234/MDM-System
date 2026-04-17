@@ -1,8 +1,12 @@
 const Queue = require('bull');
 const logger = require('../middleware/logger');
 
-// We use the same Redis instance as the cache
-const REDIS_URL = process.env.REDIS_URL || process.env.MONGO_URI ? (process.env.REDIS_URL || `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`) : 'redis://127.0.0.1:6379';
+// We only initialize Redis if the URL is present to prevent invalid URL warnings in production
+const REDIS_URL = process.env.REDIS_URL;
+
+if (!REDIS_URL) {
+  logger.warn('⚠️ No REDIS_URL provided. Background update queue is disabled.');
+}
 
 const updateQueue = new Queue('device-updates', REDIS_URL, {
   defaultJobOptions: {

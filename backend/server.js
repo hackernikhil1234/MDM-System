@@ -13,6 +13,9 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
+// Trust proxy for Render/Vercel (important for Rate Limiting)
+app.set('trust proxy', 1);
+
 // Initialize Prometheus metrics collection
 const register = new promClient.Registry();
 promClient.collectDefaultMetrics({ register });
