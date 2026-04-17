@@ -50,15 +50,19 @@ router.post('/register', async (req, res) => {
 
     await user.save();
 
-    // Log the registration
-    await AuditLog.create({
-      action: 'USER_REGISTERED',
-      entityType: 'user',
-      entityId: user.id,
-      userId: user.id,
-      userName: user.name,
-      metadata: { email: user.email, organization: organization || 'N/A' }
-    });
+    // Log the registration (non-blocking)
+    try {
+      await AuditLog.create({
+        action: 'USER_REGISTERED',
+        entityType: 'user',
+        entityId: user.id,
+        userId: user.id,
+        userName: user.name,
+        changes: { email: user.email, organization: organization || 'N/A' }
+      });
+    } catch (auditErr) {
+      console.warn('Audit log error (non-fatal):', auditErr.message);
+    }
 
     // Auto-login after registration
     const token = jwt.sign(

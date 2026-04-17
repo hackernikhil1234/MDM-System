@@ -22,6 +22,7 @@ const auditLogSchema = new mongoose.Schema({
       'UPDATE_FAILED',
       'USER_LOGIN',
       'USER_LOGOUT',
+      'USER_REGISTERED',
       'USER_CREATED',
       'USER_UPDATED',
       'BULK_UPDATE_SCHEDULED'
