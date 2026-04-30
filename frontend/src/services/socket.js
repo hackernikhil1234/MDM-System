@@ -1,70 +1,71 @@
 import { io } from 'socket.io-client';
 
-class SocketService {
-  constructor() {
-    this.socket = null;
-    this.listeners = new Map();
-  }
+// Plain-object singleton — avoids class constructor minification bugs in production builds
+const SocketService = {
+  socket: null,
+  _listeners: {},
 
   connect(token) {
-    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
-    this.socket = io(SOCKET_URL, {
-      auth: { token },
-      transports: ['websocket'],
-    });
+    if (this.socket && this.socket.connected) return; // already connected
 
-    this.socket.on('connect', () => {
-      console.log('Connected to real-time server');
-    });
+    const SOCKET_URL =
+      process.env.REACT_APP_SOCKET_URL ||
+      process.env.REACT_APP_API_URL?.replace('/api', '') ||
+      'http://localhost:5000';
 
-    this.socket.on('update-progress', (data) => {
-      this.notifyListeners('update-progress', data);
-    });
+    try {
+      this.socket = io(SOCKET_URL, {
+        auth: { token },
+        transports: ['websocket', 'polling'], // fallback to polling if WS blocked
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
+        timeout: 10000,
+      });
 
-    this.socket.on('device-status', (data) => {
-      this.notifyListeners('device-status', data);
-    });
+      this.socket.on('connect', () => {
+        console.log('[Socket] Connected to real-time server');
+      });
 
-    this.socket.on('admin_command', (data) => {
-      // Broadcast WebSocket payloads (e.g., instant locks) across the React app globally
-      this.notifyListeners('admin_command', data);
-    });
+      this.socket.on('connect_error', (err) => {
+        console.warn('[Socket] Connection error:', err.message);
+      });
 
-    this.socket.on('schedule-update', (data) => {
-      this.notifyListeners('schedule-update', data);
-    });
+      this.socket.on('disconnect', (reason) => {
+        console.log('[Socket] Disconnected:', reason);
+      });
 
-    this.socket.on('disconnect', () => {
-      console.log('Disconnected from real-time server');
-    });
-  }
-
-  subscribe(event, callback) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, []);
+      // Forward all known server events to registered listeners
+      const events = ['update-progress', 'device-status', 'admin_command', 'schedule-update'];
+      events.forEach((event) => {
+        this.socket.on(event, (data) => this._emit(event, data));
+      });
+    } catch (err) {
+      console.error('[Socket] Failed to initialise:', err);
     }
-    this.listeners.get(event).push(callback);
-  }
-
-  unsubscribe(event, callback) {
-    if (this.listeners.has(event)) {
-      const callbacks = this.listeners.get(event).filter(cb => cb !== callback);
-      this.listeners.set(event, callbacks);
-    }
-  }
-
-  notifyListeners(event, data) {
-    if (this.listeners.has(event)) {
-      this.listeners.get(event).forEach(callback => callback(data));
-    }
-  }
+  },
 
   disconnect() {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
     }
-  }
-}
-const socketService = new SocketService();
-export default socketService;
+  },
+
+  subscribe(event, callback) {
+    if (!this._listeners[event]) this._listeners[event] = [];
+    this._listeners[event].push(callback);
+  },
+
+  unsubscribe(event, callback) {
+    if (!this._listeners[event]) return;
+    this._listeners[event] = this._listeners[event].filter((cb) => cb !== callback);
+  },
+
+  _emit(event, data) {
+    (this._listeners[event] || []).forEach((cb) => {
+      try { cb(data); } catch (e) { console.error('[Socket] Listener error:', e); }
+    });
+  },
+};
+
+export default SocketService;
