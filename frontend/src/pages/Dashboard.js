@@ -178,8 +178,7 @@ function Dashboard() {
   };
 
   return (
-    <PageTransition>
-      <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
         {/* Header Section */}
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 3 }}>
           <Box>
@@ -399,7 +398,7 @@ function Dashboard() {
           <MenuItem onClick={() => { setTimeRange('30d'); setAnchorEl(null); }}><ListItemText>Last 30 Days</ListItemText></MenuItem>
         </Menu>
       </Box>
-    </PageTransition>
+    </Box>
   );
 }
 
