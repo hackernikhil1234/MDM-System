@@ -38,7 +38,7 @@ function EmptyState({ icon, title, description, actionText, onAction }) {
         </Box>
         <Typography
           variant="h6"
-          sx={{ fontWeight: 700, color: '#1A1A2E', mb: 1 }}
+          sx={{ fontWeight: 800, color: '#fff', mb: 1, letterSpacing: '-0.02em' }}
         >
           {title}
         </Typography>

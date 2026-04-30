@@ -265,29 +265,47 @@ function ScheduleManagement() {
   return (
     <PageTransition>
       <Box sx={{ flexGrow: 1 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Box>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: '#ffffff' }}>
-              Update Schedules
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#a1a1aa' }}>
-              Manage and monitor update rollouts
-            </Typography>
-          </Box>
+  const ORANGE = '#FF6B35';
+
+  return (
+    <PageTransition>
+      <Box sx={{ flexGrow: 1 }}>
+        {/* Premium Header */}
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+            borderRadius: 4,
+            p: { xs: 3, md: 4 },
+            mb: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            border: '1px solid rgba(255,255,255,0.05)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+          }}
+        >
+          <Box sx={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(ORANGE, 0.08)} 0%, transparent 70%)`, pointerEvents: 'none' }} />
           
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setDialogOpen(true)}
-            sx={{
-              bgcolor: '#3b82f6',
-              '&:hover': { bgcolor: '#2563eb' },
-            }}
-          >
-            New Schedule
-          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3, position: 'relative', zIndex: 1 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mb: 1, letterSpacing: '-0.03em' }}>
+                Update Rollouts
+              </Typography>
+              <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.95rem', fontWeight: 500 }}>
+                Orchestrate and monitor firmware deployments across your fleet
+              </Typography>
+            </Box>
+            
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setDialogOpen(true)}
+              sx={{ bgcolor: ORANGE, color: '#fff', borderRadius: 2, fontWeight: 800, px: 3, '&:hover': { bgcolor: '#E55A2B', transform: 'translateY(-2px)' }, boxShadow: `0 8px 20px ${alpha(ORANGE, 0.3)}`, transition: 'all 0.2s' }}
+            >
+              Create Campaign
+            </Button>
+          </Box>
         </Box>
+
 
         {error && (
           <Alert 
@@ -301,64 +319,49 @@ function ScheduleManagement() {
 
         {/* Stats Cards */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <StatsCard
-              title="Total Schedules"
-              value={stats.total}
-              icon={<ScheduleIcon />}
-              color="#3b82f6"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <StatsCard
-              title="In Progress"
-              value={stats.inProgress}
-              icon={<PlayIcon />}
-              color="#22c55e"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <StatsCard
-              title="Pending Approval"
-              value={stats.pending}
-              icon={<WarningIcon />}
-              color="#f59e0b"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <StatsCard
-              title="Completed"
-              value={stats.completed}
-              icon={<CheckCircleIcon />}
-              color="#8b5cf6"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <StatsCard
-              title="Cancelled"
-              value={stats.cancelled}
-              icon={<CancelIcon />}
-              color="#ef4444"
-            />
-          </Grid>
+          {[
+            { title: 'Total Campaigns', value: stats.total, icon: <ScheduleIcon />, color: '#3B82F6' },
+            { title: 'In Progress', value: stats.inProgress, icon: <PlayIcon />, color: '#10B981' },
+            { title: 'Awaiting Approval', value: stats.pending, icon: <WarningIcon />, color: '#F59E0B' },
+            { title: 'Finalized', value: stats.completed, icon: <CheckCircleIcon />, color: '#8B5CF6' },
+            { title: 'Cancelled', value: stats.cancelled, icon: <CancelIcon />, color: '#EF4444' }
+          ].map((stat, i) => (
+            <Grid item xs={12} sm={6} md={2.4} key={i}>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                <Card className="glass-card" sx={{ border: `1px solid ${alpha(stat.color, 0.1)}` }}>
+                  <CardContent sx={{ p: 2.5 }}>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '10px', background: `${stat.color}15`, border: `1px solid ${stat.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: stat.color, mb: 2 }}>
+                      {stat.icon}
+                    </Box>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      {stat.title}
+                    </Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mt: 0.5 }}>{stat.value}</Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Grid>
+          ))}
         </Grid>
 
+
         {/* Schedules Table */}
-        <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: '#111111', border: '1px solid #27272a', colorScheme: 'dark' }} className="dark-container">
+        <Card className="glass-card" sx={{ p: 0, overflow: 'hidden' }}>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Name</TableCell>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Version Change</TableCell>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Type</TableCell>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Target</TableCell>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Status</TableCell>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Progress</TableCell>
-                  <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Created</TableCell>
-                  <TableCell align="right" sx={{ color: '#ffffff', fontWeight: 600 }}>Actions</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>CAMPAIGN</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>VERSION PATH</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>STRATEGY</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>CRITERIA</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>STATUS</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>PROGRESS</TableCell>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>METRICS</TableCell>
+                  <TableCell align="right" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>ACTIONS</TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {loading ? (
                   <TableRow>
@@ -387,111 +390,111 @@ function ScheduleManagement() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        style={{ display: 'table-row', cursor: 'pointer' }}
-                        onClick={() => handleViewDetails(schedule)}
+                        style={{ display: 'table-row' }}
                       >
-                        <TableCell>
-                          <Typography variant="body2" fontWeight={500} sx={{ color: '#ffffff' }}>
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#ffffff' }}>
                             {schedule.name}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#71717a' }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>
                             {schedule.description?.substring(0, 50)}
                             {schedule.description?.length > 50 ? '...' : ''}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Chip 
-                            label={`v${schedule.fromVersionCode} → v${schedule.toVersionCode}`}
-                            size="small"
-                            sx={{
-                              bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              color: theme.palette.primary.main,
-                              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                              fontWeight: 500,
-                            }}
-                          />
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>v{schedule.fromVersionCode}</Typography>
+                            <Box sx={{ width: 12, height: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: ORANGE }}>v{schedule.toVersionCode}</Typography>
+                          </Box>
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                           <Chip
                             label={schedule.scheduleType}
                             size="small"
                             sx={{
                               bgcolor: schedule.scheduleType === 'phased' 
-                                ? alpha(theme.palette.secondary.main, 0.1)
-                                : alpha(theme.palette.info.main, 0.1),
+                                ? alpha('#8B5CF6', 0.1)
+                                : alpha('#3B82F6', 0.1),
                               color: schedule.scheduleType === 'phased' 
-                                ? theme.palette.secondary.main
-                                : theme.palette.info.main,
+                                ? '#8B5CF6'
+                                : '#3B82F6',
                               border: `1px solid ${schedule.scheduleType === 'phased' 
-                                ? alpha(theme.palette.secondary.main, 0.2)
-                                : alpha(theme.palette.info.main, 0.2)}`,
+                                ? alpha('#8B5CF6', 0.2)
+                                : alpha('#3B82F6', 0.2)}`,
+                              fontWeight: 800,
+                              fontSize: '0.65rem',
+                              textTransform: 'uppercase'
                             }}
                           />
                         </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <LocationIcon sx={{ fontSize: 14, color: '#71717a' }} />
-                            <Typography variant="body2" sx={{ color: '#e4e4e7' }}>
-                              {schedule.targetCriteria?.regions?.length || 'All'} regions
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <LocationIcon sx={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }} />
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600, fontSize: '0.8rem' }}>
+                              {schedule.targetCriteria?.regions?.length || 'Global'}
                             </Typography>
                           </Box>
                           {schedule.targetCriteria?.percentage < 100 && (
-                            <Typography variant="caption" sx={{ color: '#71717a', display: 'block' }}>
-                              {schedule.targetCriteria.percentage}% rollout
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontWeight: 700 }}>
+                              {schedule.targetCriteria.percentage}% Sample
                             </Typography>
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                           <Chip
                             label={schedule.status.replace(/_/g, ' ')}
-                            icon={getStatusIcon(schedule.status)}
                             size="small"
-                            sx={getStatusChipStyle(schedule.status)}
+                            sx={{
+                              ...getStatusChipStyle(schedule.status),
+                              fontWeight: 800,
+                              fontSize: '0.6rem',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em'
+                            }}
                           />
                         </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Box sx={{ width: 80 }}>
-                              <LinearProgress
-                                variant="determinate"
-                                value={schedule.stats?.totalDevices ? 
-                                  ((schedule.stats.completedDevices + schedule.stats.failedDevices) / schedule.stats.totalDevices) * 100 : 0
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <Box sx={{ width: 100 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={schedule.stats?.totalDevices ? 
+                                ((schedule.stats.completedDevices + schedule.stats.failedDevices) / schedule.stats.totalDevices) * 100 : 0
+                              }
+                              sx={{ 
+                                height: 4, 
+                                borderRadius: 2,
+                                bgcolor: 'rgba(255,255,255,0.05)',
+                                '& .MuiLinearProgress-bar': {
+                                  background: schedule.status === 'completed' ? '#10B981' :
+                                             schedule.status === 'failed' ? '#EF4444' :
+                                             `linear-gradient(90deg, ${ORANGE}, #FF8C5A)`
                                 }
-                                sx={{ 
-                                  height: 4, 
-                                  borderRadius: 2,
-                                  bgcolor: '#27272a',
-                                  '& .MuiLinearProgress-bar': {
-                                    bgcolor: schedule.status === 'completed' ? '#22c55e' :
-                                            schedule.status === 'failed' ? '#ef4444' :
-                                            '#60a5fa'
-                                  }
-                                }}
-                              />
-                            </Box>
-                            <Typography variant="caption" sx={{ color: '#a1a1aa' }}>
-                              {schedule.stats?.completedDevices || 0}/{schedule.stats?.totalDevices || 0}
+                              }}
+                            />
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 700, mt: 0.5, display: 'block', fontSize: '0.65rem' }}>
+                              {schedule.stats?.completedDevices || 0} / {schedule.stats?.totalDevices || 0} COMPLETED
                             </Typography>
                           </Box>
                         </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" sx={{ color: '#e4e4e7' }}>
-                            {format(new Date(schedule.createdAt), 'MMM dd, yyyy')}
+                        <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 700, fontSize: '0.8rem' }}>
+                            {format(new Date(schedule.createdAt), 'MMM dd')}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#71717a' }}>
-                            by {schedule.createdBy?.userName || 'System'}
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>
+                            {schedule.createdBy?.userName?.split(' ')[0] || 'System'}
                           </Typography>
                         </TableCell>
-                        <TableCell align="right">
-                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                            <Tooltip title="View Details">
+                        <TableCell align="right" sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                            <Tooltip title="Deep Analytics">
                               <IconButton 
                                 size="small" 
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewDetails(schedule);
                                 }}
-                                sx={{ color: '#60a5fa' }}
+                                sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#3B82F6', bgcolor: 'rgba(59, 130, 246, 0.1)' } }}
                               >
                                 <VisibilityIcon fontSize="small" />
                               </IconButton>
@@ -499,26 +502,26 @@ function ScheduleManagement() {
                             
                             {schedule.status === 'pending_approval' && (
                               <>
-                                <Tooltip title="Approve">
+                                <Tooltip title="Approve Execution">
                                   <IconButton 
                                     size="small" 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleApproveSchedule(schedule._id);
                                     }}
-                                    sx={{ color: '#22c55e' }}
+                                    sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#10B981', bgcolor: 'rgba(16, 185, 129, 0.1)' } }}
                                   >
                                     <CheckCircleIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Reject">
+                                <Tooltip title="Reject Execution">
                                   <IconButton 
                                     size="small" 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleCancelSchedule(schedule._id);
                                     }}
-                                    sx={{ color: '#ef4444' }}
+                                    sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' } }}
                                   >
                                     <CancelIcon fontSize="small" />
                                   </IconButton>
@@ -527,14 +530,14 @@ function ScheduleManagement() {
                             )}
                             
                             {schedule.status === 'in_progress' && (
-                              <Tooltip title="Cancel Schedule">
+                              <Tooltip title="Kill Campaign">
                                 <IconButton 
                                   size="small" 
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleCancelSchedule(schedule._id);
                                   }}
-                                  sx={{ color: '#ef4444' }}
+                                  sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' } }}
                                 >
                                   <CancelIcon fontSize="small" />
                                 </IconButton>
@@ -542,7 +545,7 @@ function ScheduleManagement() {
                             )}
                             
                             {(schedule.status === 'draft' || schedule.status === 'cancelled' || schedule.status === 'completed') && (
-                              <Tooltip title="Delete Schedule">
+                              <Tooltip title="Archive Record">
                                 <IconButton 
                                   size="small" 
                                   onClick={(e) => {
@@ -550,7 +553,7 @@ function ScheduleManagement() {
                                     setScheduleToDelete(schedule);
                                     setDeleteDialogOpen(true);
                                   }}
-                                  sx={{ color: '#ef4444' }}
+                                  sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' } }}
                                 >
                                   <DeleteIcon fontSize="small" />
                                 </IconButton>
@@ -561,6 +564,7 @@ function ScheduleManagement() {
                       </motion.tr>
                     ))}
                   </AnimatePresence>
+
                 )}
               </TableBody>
             </Table>
@@ -595,16 +599,19 @@ function ScheduleManagement() {
           fullWidth
           PaperProps={{
             sx: {
-              bgcolor: '#111111',
-              border: '1px solid #27272a',
-              colorScheme: 'dark',
-            },
-            className: 'dark-container'
+              bgcolor: '#1a1a2e',
+              backgroundImage: 'none',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 3,
+              boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+              color: '#fff'
+            }
           }}
         >
-          <DialogTitle sx={{ color: '#ffffff', borderBottom: '1px solid #27272a' }}>
-            Create Update Schedule
+          <DialogTitle sx={{ p: 3, fontWeight: 800, color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            Configure New Campaign
           </DialogTitle>
+
           <DialogContent sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
@@ -616,35 +623,57 @@ function ScheduleManagement() {
                   variant="outlined"
                   required
                   error={!formData.name && error?.includes('name')}
-                  InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                  InputProps={{ sx: { color: '#ffffff' } }}
+                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { 
+                      color: '#fff',
+                      '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused fieldset': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    } 
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Description"
+                  label="Mission Objective (Description)"
                   multiline
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   variant="outlined"
-                  InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                  InputProps={{ sx: { color: '#ffffff' } }}
+                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { 
+                      color: '#fff',
+                      '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused fieldset': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    } 
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
                 <FormControl fullWidth variant="outlined" required>
-                  <InputLabel sx={{ color: '#a1a1aa' }}>From Version</InputLabel>
+                  <InputLabel sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Source Version</InputLabel>
                   <Select
                     value={formData.fromVersionCode}
                     onChange={(e) => setFormData({...formData, fromVersionCode: e.target.value})}
-                    label="From Version"
-                    sx={{ color: '#ffffff' }}
+                    label="Source Version"
+                    sx={{ 
+                      color: '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    }}
                   >
                     {versionList.map(v => (
-                      <MenuItem key={v.versionCode} value={v.versionCode}>
-                        v{v.versionName} (Code: {v.versionCode})
+                      <MenuItem key={v.versionCode} value={v.versionCode} sx={{ fontWeight: 600 }}>
+                        v{v.versionName} (ID: {v.versionCode})
                       </MenuItem>
                     ))}
                   </Select>
@@ -652,16 +681,22 @@ function ScheduleManagement() {
               </Grid>
               <Grid item xs={6}>
                 <FormControl fullWidth variant="outlined" required>
-                  <InputLabel sx={{ color: '#a1a1aa' }}>To Version</InputLabel>
+                  <InputLabel sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Target Version</InputLabel>
                   <Select
                     value={formData.toVersionCode}
                     onChange={(e) => setFormData({...formData, toVersionCode: e.target.value})}
-                    label="To Version"
-                    sx={{ color: '#ffffff' }}
+                    label="Target Version"
+                    sx={{ 
+                      color: '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    }}
                   >
                     {versionList.map(v => (
-                      <MenuItem key={v.versionCode} value={v.versionCode}>
-                        v{v.versionName} (Code: {v.versionCode})
+                      <MenuItem key={v.versionCode} value={v.versionCode} sx={{ fontWeight: 600 }}>
+                        v{v.versionName} (ID: {v.versionCode})
                       </MenuItem>
                     ))}
                   </Select>
@@ -669,16 +704,22 @@ function ScheduleManagement() {
               </Grid>
               <Grid item xs={6}>
                 <FormControl fullWidth variant="outlined">
-                  <InputLabel sx={{ color: '#a1a1aa' }}>Schedule Type</InputLabel>
+                  <InputLabel sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Rollout Strategy</InputLabel>
                   <Select
                     value={formData.scheduleType}
                     onChange={(e) => setFormData({...formData, scheduleType: e.target.value})}
-                    label="Schedule Type"
-                    sx={{ color: '#ffffff' }}
+                    label="Rollout Strategy"
+                    sx={{ 
+                      color: '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    }}
                   >
-                    <MenuItem value="immediate">Immediate</MenuItem>
-                    <MenuItem value="scheduled">Scheduled</MenuItem>
-                    <MenuItem value="phased">Phased Rollout</MenuItem>
+                    <MenuItem value="immediate" sx={{ fontWeight: 600 }}>Immediate Deployment</MenuItem>
+                    <MenuItem value="scheduled" sx={{ fontWeight: 600 }}>Delayed Schedule</MenuItem>
+                    <MenuItem value="phased" sx={{ fontWeight: 600 }}>Phased Wave Rollout</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -686,12 +727,20 @@ function ScheduleManagement() {
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    label="Schedule Time"
+                    label="Deployment Time"
                     type="datetime-local"
                     value={formData.scheduledTime}
                     onChange={(e) => setFormData({...formData, scheduledTime: e.target.value})}
-                    InputLabelProps={{ shrink: true, sx: { color: '#a1a1aa' } }}
-                    InputProps={{ sx: { color: '#ffffff' } }}
+                    InputLabelProps={{ shrink: true, sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                    sx={{ 
+                      '& .MuiOutlinedInput-root': { 
+                        color: '#fff',
+                        '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                        '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                        '&.Mui-focused fieldset': { borderColor: ORANGE },
+                        bgcolor: 'rgba(255,255,255,0.02)'
+                      } 
+                    }}
                   />
                 </Grid>
               )}
@@ -700,46 +749,62 @@ function ScheduleManagement() {
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
-                      label="Batch Size"
+                      label="Batch Payload Size"
                       type="number"
                       value={formData.phasedConfig.batchSize}
                       onChange={(e) => setFormData({
                         ...formData, 
                         phasedConfig: {...formData.phasedConfig, batchSize: parseInt(e.target.value)}
                       })}
-                      InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                      InputProps={{ sx: { color: '#ffffff' } }}
+                      InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                      sx={{ 
+                        '& .MuiOutlinedInput-root': { 
+                          color: '#fff',
+                          '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                          '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                          '&.Mui-focused fieldset': { borderColor: ORANGE },
+                          bgcolor: 'rgba(255,255,255,0.02)'
+                        } 
+                      }}
                     />
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
-                      label="Batch Interval (minutes)"
+                      label="Wave Interval (minutes)"
                       type="number"
                       value={formData.phasedConfig.batchInterval}
                       onChange={(e) => setFormData({
                         ...formData, 
                         phasedConfig: {...formData.phasedConfig, batchInterval: parseInt(e.target.value)}
                       })}
-                      InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                      InputProps={{ sx: { color: '#ffffff' } }}
+                      InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                      sx={{ 
+                        '& .MuiOutlinedInput-root': { 
+                          color: '#fff',
+                          '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                          '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                          '&.Mui-focused fieldset': { borderColor: ORANGE },
+                          bgcolor: 'rgba(255,255,255,0.02)'
+                        } 
+                      }}
                     />
                   </Grid>
                 </>
               )}
 
               <Grid item xs={12}>
-                <Divider sx={{ my: 1, borderColor: '#27272a' }} />
-                <Typography variant="subtitle2" gutterBottom sx={{ color: '#ffffff', mt: 2 }}>
-                  Target Criteria
+                <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.05)' }} />
+                <Typography variant="subtitle2" gutterBottom sx={{ color: ORANGE, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.7rem' }}>
+                  Target Acquisition Criteria
                 </Typography>
               </Grid>
 
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Target Regions (comma separated)"
-                  placeholder="North America, Europe, Asia"
+                  label="Target Regions"
+                  placeholder="Global, APAC, EMEA..."
                   value={formData.targetCriteria.regions.join(', ')}
                   onChange={(e) => setFormData({
                     ...formData,
@@ -748,15 +813,23 @@ function ScheduleManagement() {
                       regions: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
                     }
                   })}
-                  InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                  InputProps={{ sx: { color: '#ffffff' } }}
+                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { 
+                      color: '#fff',
+                      '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused fieldset': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    } 
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Target Cities (comma separated)"
-                  placeholder="New York, London, Tokyo"
+                  label="Target Specific Cities"
+                  placeholder="Optional city level targeting..."
                   value={formData.targetCriteria.cities.join(', ')}
                   onChange={(e) => setFormData({
                     ...formData,
@@ -765,14 +838,22 @@ function ScheduleManagement() {
                       cities: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
                     }
                   })}
-                  InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                  InputProps={{ sx: { color: '#ffffff' } }}
+                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { 
+                      color: '#fff',
+                      '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused fieldset': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    } 
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
                   fullWidth
-                  label="Rollout Percentage"
+                  label="Rollout Sampling (%)"
                   type="number"
                   value={formData.targetCriteria.percentage}
                   onChange={(e) => setFormData({
@@ -783,25 +864,34 @@ function ScheduleManagement() {
                     }
                   })}
                   inputProps={{ min: 1, max: 100 }}
-                  InputLabelProps={{ sx: { color: '#a1a1aa' } }}
-                  InputProps={{ sx: { color: '#ffffff' } }}
+                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { 
+                      color: '#fff',
+                      '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                      '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                      '&.Mui-focused fieldset': { borderColor: ORANGE },
+                      bgcolor: 'rgba(255,255,255,0.02)'
+                    } 
+                  }}
                 />
               </Grid>
             </Grid>
           </DialogContent>
-          <DialogActions sx={{ p: 3, borderTop: '1px solid #27272a' }}>
-            <Button onClick={() => setDialogOpen(false)} sx={{ color: '#a1a1aa' }}>
-              Cancel
+          <DialogActions sx={{ p: 4, borderTop: '1px solid rgba(255,255,255,0.05)', gap: 2 }}>
+            <Button onClick={() => setDialogOpen(false)} sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700, '&:hover': { color: '#fff' } }}>
+              Discard Changes
             </Button>
             <Button 
               onClick={handleCreateSchedule} 
               variant="contained"
               disabled={loading}
-              sx={{ bgcolor: '#3b82f6' }}
+              sx={{ bgcolor: ORANGE, color: '#fff', fontWeight: 800, px: 4, borderRadius: 2, '&:hover': { bgcolor: '#E55A2B' }, boxShadow: `0 8px 20px ${alpha(ORANGE, 0.2)}` }}
             >
-              {loading ? 'Creating...' : 'Create Schedule'}
+              Initiate Campaign
             </Button>
           </DialogActions>
+
         </Dialog>
 
         {/* Delete Confirmation Dialog */}

@@ -4,7 +4,8 @@ const updateJobSchema = new mongoose.Schema({
   deviceImei: {
     type: String,
     required: true,
-    index: true
+    index: true,
+    trim: true
   },
   scheduleId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -64,20 +65,9 @@ const updateJobSchema = new mongoose.Schema({
   downloadCompletedAt: Date,
   installationStartedAt: Date,
   installationCompletedAt: Date,
-  failedAt: Date,
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-updateJobSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
+  failedAt: Date
+}, {
+  timestamps: true
 });
 
 // Add method to update state
@@ -89,7 +79,7 @@ updateJobSchema.methods.updateState = function(state, metadata = {}) {
     metadata
   });
 
-  // Set specific timestamps
+  // Set specific timestamps for analytical tracking
   const now = new Date();
   switch(state) {
     case 'notified':
@@ -115,4 +105,4 @@ updateJobSchema.methods.updateState = function(state, metadata = {}) {
   }
 };
 
-module.exports = mongoose.model('UpdateJob', updateJobSchema);
+module.exports = mongoose.model('UpdateJob', updateJobSchema);

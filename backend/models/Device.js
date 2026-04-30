@@ -5,11 +5,15 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    index: true
+    index: true,
+    trim: true,
+    minlength: 14,
+    maxlength: 16
   },
   appVersion: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   appVersionCode: {
     type: Number,
@@ -17,22 +21,28 @@ const deviceSchema = new mongoose.Schema({
   },
   deviceOS: {
     type: String,
-    required: true
+    required: true,
+    enum: ['android', 'ios', 'windows', 'macos', 'linux'],
+    lowercase: true
   },
-  deviceModel: String,
+  deviceModel: {
+    type: String,
+    trim: true
+  },
   lastOpenTime: {
     type: Date,
     default: Date.now
   },
   location: {
-    region: String,
-    city: String,
+    region: { type: String, trim: true },
+    city: { type: String, trim: true },
     lastKnownLatitude: Number,
     lastKnownLongitude: Number
   },
   clientCustomization: {
     type: String,
-    default: 'default'
+    default: 'default',
+    trim: true
   },
   status: {
     type: String,
@@ -40,29 +50,18 @@ const deviceSchema = new mongoose.Schema({
     default: 'active'
   },
   metadata: {
-    batteryLevel: Number,
+    batteryLevel: { type: Number, min: 0, max: 100 },
     storageAvailable: Number,
     networkType: String
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
+}, {
+  timestamps: true
 });
 
-// Update the updatedAt timestamp on save
-deviceSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-// Enterprise Data Indexes
+// Enterprise Data Indexes for High-Performance Queries
 deviceSchema.index({ status: 1, lastOpenTime: -1 });
 deviceSchema.index({ 'location.region': 1, status: 1 });
 deviceSchema.index({ appVersion: 1, appVersionCode: -1 });
+deviceSchema.index({ lastOpenTime: -1 });
 
-module.exports = mongoose.model('Device', deviceSchema);
+module.exports = mongoose.model('Device', deviceSchema);

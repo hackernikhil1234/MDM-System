@@ -150,39 +150,61 @@ export default function UserManagement() {
   ];
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: '#1A1A2E', fontSize: { xs: '1.5rem', md: '2rem' } }}>
-            User Management
-          </Typography>
-          <Typography sx={{ color: '#9CA3AF', mt: 0.5 }}>
-            Manage team members, roles, and access permissions
-          </Typography>
+  const ORANGE = '#FF6B35';
+
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      {/* Premium Header */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+          borderRadius: 4,
+          p: { xs: 3, md: 4 },
+          mb: 4,
+          position: 'relative',
+          overflow: 'hidden',
+          border: '1px solid rgba(255,255,255,0.05)',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+        }}
+      >
+        <Box sx={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(ORANGE, 0.08)} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3, position: 'relative', zIndex: 1 }}>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mb: 1, letterSpacing: '-0.03em' }}>
+              Personnel Directory
+            </Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.95rem', fontWeight: 500 }}>
+              Oversee administrative access and manage team permissions
+            </Typography>
+          </Box>
+          
+          <Button
+            variant="contained"
+            startIcon={<PersonAddIcon />}
+            onClick={() => setInviteDialog(true)}
+            sx={{ bgcolor: ORANGE, color: '#fff', borderRadius: 2, fontWeight: 800, px: 3, '&:hover': { bgcolor: '#E55A2B', transform: 'translateY(-2px)' }, boxShadow: `0 8px 20px ${alpha(ORANGE, 0.3)}`, transition: 'all 0.2s' }}
+          >
+            Add Operator
+          </Button>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<PersonAddIcon />}
-          onClick={() => setInviteDialog(true)}
-          sx={{ background: 'linear-gradient(135deg, #FF6B35, #E55A2B)', borderRadius: 2.5, fontWeight: 700, boxShadow: '0 4px 14px rgba(255,107,53,0.35)', px: 3 }}
-        >
-          Add User
-        </Button>
       </Box>
 
+
       {/* Stat Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         {stats.map((s, i) => (
-          <Grid item xs={6} sm={3} key={i}>
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-              <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F3F4F6' }}>
-                <CardContent sx={{ textAlign: 'center', py: 2.5 }}>
-                  <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: `${s.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 1, color: s.color }}>
+          <Grid item xs={12} sm={6} md={3} key={i}>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+              <Card className="glass-card" sx={{ border: `1px solid ${alpha(s.color, 0.1)}` }}>
+                <CardContent sx={{ p: 2.5 }}>
+                  <Box sx={{ width: 40, height: 40, borderRadius: '10px', background: `${s.color}15`, border: `1px solid ${s.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color, mb: 2 }}>
                     {s.icon}
                   </Box>
-                  <Typography sx={{ fontWeight: 800, fontSize: '1.6rem', color: '#1A1A2E' }}>{s.value}</Typography>
-                  <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 600 }}>{s.label}</Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    {s.label}
+                  </Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mt: 0.5 }}>{s.value}</Typography>
                 </CardContent>
               </Card>
             </motion.div>
@@ -190,22 +212,37 @@ export default function UserManagement() {
         ))}
       </Grid>
 
+
       {success && <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }} onClose={() => setError('')}>{error}</Alert>}
 
-      {/* Table */}
-      <Paper sx={{ borderRadius: 3, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', overflow: 'hidden', border: '1px solid #F3F4F6' }}>
-        <Box sx={{ p: 2.5, borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 2 }}>
+      {/* Personnel Table */}
+      <Card className="glass-card" sx={{ p: 0, overflow: 'hidden' }}>
+        <Box sx={{ p: 3, borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
           <TextField
             size="small"
-            placeholder="Search users…"
+            placeholder="Search operator by name or email..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#9CA3AF', fontSize: 18 }} /></InputAdornment> }}
-            sx={{ flex: 1, '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: '#F8F9FA', '& fieldset': { borderColor: '#E5E7EB' }, '&:hover fieldset': { borderColor: '#FF6B35' } } }}
+            InputProps={{ 
+              startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} /></InputAdornment>,
+              sx: { color: '#fff' }
+            }}
+            sx={{ 
+              flex: 1, 
+              minWidth: 300,
+              '& .MuiOutlinedInput-root': { 
+                borderRadius: 2, 
+                bgcolor: 'rgba(255,255,255,0.03)', 
+                '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' }, 
+                '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                '&.Mui-focused fieldset': { borderColor: ORANGE }
+              } 
+            }}
           />
-          <Chip label={`${filteredUsers.length} users`} size="small" sx={{ bgcolor: 'rgba(255,107,53,0.1)', color: '#FF6B35', fontWeight: 700 }} />
+          <Chip label={`${filteredUsers.length} Operators Enrolled`} sx={{ bgcolor: alpha(ORANGE, 0.1), color: ORANGE, fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase' }} />
         </Box>
+
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress sx={{ color: '#FF6B35' }} /></Box>
@@ -213,90 +250,108 @@ export default function UserManagement() {
           <TableContainer>
             <Table>
               <TableHead>
-                <TableRow sx={{ bgcolor: '#FAFAFA' }}>
-                  {['User', 'Role', 'Status', 'Last Login', 'Joined', 'Actions'].map(h => (
-                    <TableCell key={h} sx={{ fontWeight: 700, color: '#6B7280', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.5 }}>{h}</TableCell>
+                <TableRow>
+                  {['OPERATOR', 'CLEARANCE LEVEL', 'CLEARANCE STATUS', 'LAST SESSION', 'ENROLLMENT', 'OPERATIONS'].map(h => (
+                    <TableCell key={h} sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {filteredUsers.map((u, i) => {
                   const rc = roleColors[u.role] || roleColors.viewer;
                   const isMe = u._id === currentUser?.id;
                   return (
-                    <TableRow key={u._id} hover sx={{ '&:hover': { bgcolor: '#FAFAFA' } }}
+                    <TableRow key={u._id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}
                       component={motion.tr} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                          <Avatar sx={{ width: 36, height: 36, bgcolor: avatarColor(u.name), fontWeight: 700, fontSize: '0.8rem' }}>
+                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Avatar 
+                            sx={{ 
+                              width: 38, 
+                              height: 38, 
+                              bgcolor: avatarColor(u.name), 
+                              fontWeight: 800, 
+                              fontSize: '0.85rem',
+                              border: '2px solid rgba(255,255,255,0.1)',
+                              boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+                            }}
+                          >
                             {getInitials(u.name)}
                           </Avatar>
                           <Box>
-                            <Typography sx={{ fontWeight: 700, color: '#1A1A2E', fontSize: '0.88rem' }}>
-                              {u.name} {isMe && <Chip label="You" size="small" sx={{ ml: 0.5, height: 18, fontSize: '0.65rem', bgcolor: 'rgba(255,107,53,0.1)', color: '#FF6B35' }} />}
+                            <Typography sx={{ fontWeight: 700, color: '#fff', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {u.name} 
+                              {isMe && <Chip label="CURRENT SESSION" size="small" sx={{ height: 16, fontSize: '0.55rem', fontWeight: 800, bgcolor: alpha(ORANGE, 0.1), color: ORANGE, border: `1px solid ${alpha(ORANGE, 0.2)}` }} />}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#9CA3AF' }}>{u.email}</Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{u.email}</Typography>
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                         <Chip 
                           icon={rc.icon}
                           label={u.role.toUpperCase()} 
                           size="small" 
                           sx={{ 
-                            bgcolor: rc.bg, 
+                            bgcolor: alpha(rc.text, 0.1), 
                             color: rc.text, 
                             fontWeight: 800, 
                             fontSize: '0.65rem',
-                            border: `1px solid ${rc.border}`,
-                            '& .MuiChip-icon': { color: 'inherit' }
+                            border: `1px solid ${alpha(rc.text, 0.2)}`,
+                            '& .MuiChip-icon': { color: 'inherit' },
+                            letterSpacing: '0.05em'
                           }} 
                         />
                       </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                           <Switch
                             checked={u.isActive}
                             onChange={() => !isMe && handleToggle(u._id)}
                             disabled={isMe}
                             size="small"
-                            sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' } }}
+                            sx={{ 
+                              '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' }, 
+                              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' },
+                              '& .MuiSwitch-track': { bgcolor: 'rgba(255,255,255,0.1)' }
+                            }}
                           />
-                          <Typography variant="caption" sx={{ color: u.isActive ? '#10B981' : '#EF4444', fontWeight: 600 }}>
-                            {u.isActive ? 'Active' : 'Inactive'}
+                          <Typography variant="caption" sx={{ color: u.isActive ? '#10B981' : '#EF4444', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase' }}>
+                            {u.isActive ? 'ACTIVE' : 'LOCKED'}
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell>
-                        <Typography variant="caption" sx={{ color: '#6B7280' }}>
-                          {u.lastLogin ? format(new Date(u.lastLogin), 'MMM d, yyyy HH:mm') : 'Never'}
+                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
+                          {u.lastLogin ? format(new Date(u.lastLogin), 'MMM d, HH:mm') : 'NO SESSIONS'}
                         </Typography>
                       </TableCell>
-                      <TableCell>
-                        <Typography variant="caption" sx={{ color: '#6B7280' }}>
+                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
                           {u.createdAt ? format(new Date(u.createdAt), 'MMM d, yyyy') : '—'}
                         </Typography>
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <Tooltip title="Change Role">
+                          <Tooltip title="Elevate/Demote Clearance">
                             <IconButton size="small" disabled={isMe}
                               onClick={() => { setRoleDialog(u); setNewRole(u.role); }}
-                              sx={{ color: '#3B82F6', '&:hover': { bgcolor: 'rgba(59,130,246,0.08)' }, '&:disabled': { color: '#D1D5DB' } }}>
+                              sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#3B82F6', bgcolor: 'rgba(59,130,246,0.1)' }, '&:disabled': { color: 'rgba(255,255,255,0.1)' } }}>
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title="Delete User">
+                          <Tooltip title="Purge Record">
                             <IconButton size="small" disabled={isMe}
                               onClick={() => setDeleteDialog(u)}
-                              sx={{ color: '#EF4444', '&:hover': { bgcolor: 'rgba(239,68,68,0.08)' }, '&:disabled': { color: '#D1D5DB' } }}>
+                              sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.1)' }, '&:disabled': { color: 'rgba(255,255,255,0.1)' } }}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </Box>
                       </TableCell>
                     </TableRow>
+
                   );
                 })}
                 {filteredUsers.length === 0 && !loading && (
@@ -309,87 +364,238 @@ export default function UserManagement() {
       </Paper>
 
       {/* Role Change Dialog */}
-      <Dialog open={!!roleDialog} onClose={() => setRoleDialog(null)} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-        <DialogTitle sx={{ fontWeight: 800, color: '#1A1A2E' }}>Change Role</DialogTitle>
-        <DialogContent sx={{ minWidth: 320 }}>
-          <Typography sx={{ mb: 2, color: '#6B7280', fontSize: '0.9rem' }}>
-            Update role for <strong>{roleDialog?.name}</strong>
+      <Dialog 
+        open={!!roleDialog} 
+        onClose={() => setRoleDialog(null)} 
+        PaperProps={{ 
+          sx: { 
+            bgcolor: '#1a1a2e', 
+            borderRadius: 3, 
+            p: 1, 
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+            color: '#fff'
+          } 
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Adjust Clearance Level</DialogTitle>
+        <DialogContent sx={{ minWidth: 320, mt: 2 }}>
+          <Typography sx={{ mb: 3, color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>
+            Modify administrative privileges for <strong style={{ color: '#fff' }}>{roleDialog?.name}</strong>
           </Typography>
           <FormControl fullWidth>
-            <InputLabel>Role</InputLabel>
-            <Select value={newRole} label="Role" onChange={e => setNewRole(e.target.value)} sx={{ borderRadius: 2 }}>
-              <MenuItem value="viewer">Viewer — Read-only access</MenuItem>
-              <MenuItem value="manager">Manager — Can manage devices & schedules</MenuItem>
-              <MenuItem value="admin">Admin — Full system access</MenuItem>
+            <InputLabel sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Clearance Level</InputLabel>
+            <Select 
+              value={newRole} 
+              label="Clearance Level" 
+              onChange={e => setNewRole(e.target.value)} 
+              sx={{ 
+                borderRadius: 2,
+                color: '#fff',
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ORANGE, 0.5) },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ORANGE },
+                bgcolor: 'rgba(255,255,255,0.02)'
+              }}
+            >
+              <MenuItem value="viewer" sx={{ fontWeight: 600 }}>Viewer — Restricted Access</MenuItem>
+              <MenuItem value="manager" sx={{ fontWeight: 600 }}>Manager — Operational Access</MenuItem>
+              <MenuItem value="admin" sx={{ fontWeight: 600 }}>Admin — Full Clearance</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-          <Button onClick={() => setRoleDialog(null)} sx={{ borderRadius: 2, color: '#6B7280' }}>Cancel</Button>
-          <Button variant="contained" onClick={handleRoleChange}
-            sx={{ borderRadius: 2, background: 'linear-gradient(135deg, #FF6B35, #E55A2B)', fontWeight: 700 }}>
-            Update Role
+        <DialogActions sx={{ px: 3, pb: 3, gap: 2, borderTop: '1px solid rgba(255,255,255,0.05)', pt: 2 }}>
+          <Button onClick={() => setRoleDialog(null)} sx={{ borderRadius: 2, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>Abort</Button>
+          <Button 
+            variant="contained" 
+            onClick={handleRoleChange}
+            sx={{ borderRadius: 2, bgcolor: ORANGE, fontWeight: 800, px: 3, '&:hover': { bgcolor: '#E55A2B' } }}
+          >
+            Commit Change
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Confirm Delete Dialog */}
-      <Dialog open={!!deleteDialog} onClose={() => setDeleteDialog(null)} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-        <DialogTitle sx={{ fontWeight: 800, color: '#EF4444' }}>Delete User</DialogTitle>
-        <DialogContent sx={{ minWidth: 320 }}>
-          <Typography sx={{ color: '#6B7280' }}>
-            Are you sure you want to delete <strong>{deleteDialog?.name}</strong>? This action cannot be undone.
+      <Dialog 
+        open={!!deleteDialog} 
+        onClose={() => setDeleteDialog(null)} 
+        PaperProps={{ 
+          sx: { 
+            bgcolor: '#1a1a2e', 
+            borderRadius: 3, 
+            p: 1, 
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+            color: '#fff'
+          } 
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: '#EF4444', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Purge Personnel Record</DialogTitle>
+        <DialogContent sx={{ minWidth: 320, mt: 2 }}>
+          <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+            Are you certain you wish to purge <strong style={{ color: '#fff' }}>{deleteDialog?.name}</strong>? This operation is irreversible and all associated logs will be archived.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-          <Button onClick={() => setDeleteDialog(null)} sx={{ borderRadius: 2, color: '#6B7280' }}>Cancel</Button>
-          <Button variant="contained" onClick={handleDelete} disabled={deleting}
-            sx={{ borderRadius: 2, bgcolor: '#EF4444', '&:hover': { bgcolor: '#DC2626' }, fontWeight: 700 }}>
-            {deleting ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Delete User'}
+        <DialogActions sx={{ px: 3, pb: 3, gap: 2, borderTop: '1px solid rgba(255,255,255,0.05)', pt: 2 }}>
+          <Button onClick={() => setDeleteDialog(null)} sx={{ borderRadius: 2, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>Cancel</Button>
+          <Button 
+            variant="contained" 
+            onClick={handleDelete} 
+            disabled={deleting}
+            sx={{ borderRadius: 2, bgcolor: '#EF4444', '&:hover': { bgcolor: '#DC2626' }, fontWeight: 800, px: 3 }}
+          >
+            {deleting ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Confirm Purge'}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Add User Dialog */}
-      <Dialog open={inviteDialog} onClose={() => setInviteDialog(false)} PaperProps={{ sx: { borderRadius: 3, p: 1 } }} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 800, color: '#1A1A2E' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ShieldIcon sx={{ color: '#FF6B35' }} /> Add New User
+      <Dialog 
+        open={inviteDialog} 
+        onClose={() => setInviteDialog(false)} 
+        PaperProps={{ 
+          sx: { 
+            bgcolor: '#1a1a2e', 
+            borderRadius: 3, 
+            p: 1, 
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+            color: '#fff'
+          } 
+        }} 
+        maxWidth="sm" 
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <ShieldIcon sx={{ color: ORANGE }} /> Enroll New Personnel
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <DialogContent sx={{ mt: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             {error && <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>}
-            <TextField fullWidth label="Full Name" value={inviteForm.name} onChange={e => setInviteForm(p => ({ ...p, name: e.target.value }))}
-              InputProps={{ startAdornment: <InputAdornment position="start"><PersonIcon sx={{ color: '#9CA3AF', fontSize: 18 }} /></InputAdornment> }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-            <TextField fullWidth label="Email Address" type="email" value={inviteForm.email} onChange={e => setInviteForm(p => ({ ...p, email: e.target.value }))}
-              InputProps={{ startAdornment: <InputAdornment position="start"><EmailIcon sx={{ color: '#9CA3AF', fontSize: 18 }} /></InputAdornment> }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-            <TextField fullWidth label="Temporary Password" type="password" value={inviteForm.password} onChange={e => setInviteForm(p => ({ ...p, password: e.target.value }))}
-              helperText="Min. 8 characters"
-              InputProps={{ startAdornment: <InputAdornment position="start"><LockIcon sx={{ color: '#9CA3AF', fontSize: 18 }} /></InputAdornment> }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-            <FormControl fullWidth sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}>
-              <InputLabel>Role</InputLabel>
-              <Select value={inviteForm.role} label="Role" onChange={e => setInviteForm(p => ({ ...p, role: e.target.value }))}>
-                <MenuItem value="viewer">Viewer</MenuItem>
-                <MenuItem value="manager">Manager</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
+            
+            <TextField 
+              fullWidth 
+              label="Full Name" 
+              value={inviteForm.name} 
+              onChange={e => setInviteForm(p => ({ ...p, name: e.target.value }))}
+              InputProps={{ 
+                startAdornment: <InputAdornment position="start"><PersonIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} /></InputAdornment>,
+                sx: { color: '#fff' }
+              }}
+              InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2,
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                  '&.Mui-focused fieldset': { borderColor: ORANGE },
+                  bgcolor: 'rgba(255,255,255,0.02)'
+                } 
+              }} 
+            />
+            
+            <TextField 
+              fullWidth 
+              label="Email Address" 
+              type="email" 
+              value={inviteForm.email} 
+              onChange={e => setInviteForm(p => ({ ...p, email: e.target.value }))}
+              InputProps={{ 
+                startAdornment: <InputAdornment position="start"><EmailIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} /></InputAdornment>,
+                sx: { color: '#fff' }
+              }}
+              InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2,
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                  '&.Mui-focused fieldset': { borderColor: ORANGE },
+                  bgcolor: 'rgba(255,255,255,0.02)'
+                } 
+              }} 
+            />
+            
+            <TextField 
+              fullWidth 
+              label="Access Password" 
+              type="password" 
+              value={inviteForm.password} 
+              onChange={e => setInviteForm(p => ({ ...p, password: e.target.value }))}
+              helperText="Minimum 8 alphanumeric characters required"
+              FormHelperTextProps={{ sx: { color: 'rgba(255,255,255,0.3)', fontWeight: 600 } }}
+              InputProps={{ 
+                startAdornment: <InputAdornment position="start"><LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} /></InputAdornment>,
+                sx: { color: '#fff' }
+              }}
+              InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2,
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                  '&.Mui-focused fieldset': { borderColor: ORANGE },
+                  bgcolor: 'rgba(255,255,255,0.02)'
+                } 
+              }} 
+            />
+            
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Assigned Clearance</InputLabel>
+              <Select 
+                value={inviteForm.role} 
+                label="Assigned Clearance" 
+                onChange={e => setInviteForm(p => ({ ...p, role: e.target.value }))}
+                sx={{ 
+                  borderRadius: 2,
+                  color: '#fff',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ORANGE, 0.5) },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ORANGE },
+                  bgcolor: 'rgba(255,255,255,0.02)'
+                }}
+              >
+                <MenuItem value="viewer" sx={{ fontWeight: 600 }}>Viewer</MenuItem>
+                <MenuItem value="manager" sx={{ fontWeight: 600 }}>Manager</MenuItem>
+                <MenuItem value="admin" sx={{ fontWeight: 600 }}>Admin</MenuItem>
               </Select>
             </FormControl>
-            <TextField fullWidth label="Organization (optional)" value={inviteForm.organization} onChange={e => setInviteForm(p => ({ ...p, organization: e.target.value }))}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+            
+            <TextField 
+              fullWidth 
+              label="Organization (Optional)" 
+              value={inviteForm.organization} 
+              onChange={e => setInviteForm(p => ({ ...p, organization: e.target.value }))}
+              InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', fontWeight: 600 } }}
+              sx={{ 
+                '& .MuiOutlinedInput-root': { 
+                  borderRadius: 2,
+                  color: '#fff',
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                  '&:hover fieldset': { borderColor: alpha(ORANGE, 0.5) },
+                  '&.Mui-focused fieldset': { borderColor: ORANGE },
+                  bgcolor: 'rgba(255,255,255,0.02)'
+                } 
+              }} 
+            />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button onClick={() => setInviteDialog(false)} sx={{ borderRadius: 2, color: '#6B7280' }}>Cancel</Button>
-          <Button variant="contained" onClick={handleInvite} disabled={inviteLoading}
-            sx={{ borderRadius: 2, background: 'linear-gradient(135deg, #FF6B35, #E55A2B)', fontWeight: 700, px: 3 }}>
-            {inviteLoading ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Add User'}
+        <DialogActions sx={{ px: 4, pb: 4, gap: 2, borderTop: '1px solid rgba(255,255,255,0.05)', pt: 3 }}>
+          <Button onClick={() => setInviteDialog(false)} sx={{ borderRadius: 2, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>Cancel</Button>
+          <Button 
+            variant="contained" 
+            onClick={handleInvite} 
+            disabled={inviteLoading}
+            sx={{ borderRadius: 2, bgcolor: ORANGE, fontWeight: 800, px: 4, '&:hover': { bgcolor: '#E55A2B' }, boxShadow: `0 8px 20px ${alpha(ORANGE, 0.2)}` }}
+          >
+            {inviteLoading ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Finalize Enrollment'}
           </Button>
         </DialogActions>
       </Dialog>
+
     </Box>
   );
 }

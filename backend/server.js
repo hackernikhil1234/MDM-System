@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const xss = require('xss-clean');
+const compression = require('compression');
 const promClient = require('prom-client');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -13,14 +14,13 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
-// Trust proxy for Render/Vercel (important for Rate Limiting)
+// Trust proxy for Load Balancers (Render/Vercel/AWS)
 app.set('trust proxy', 1);
 
-// Initialize Prometheus metrics collection
+// Initialize Prometheus Metrics
 const register = new promClient.Registry();
 promClient.collectDefaultMetrics({ register });
 
-// Custom Prometheus HTTP duration metric
 const httpRequestTimer = new promClient.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
@@ -29,23 +29,19 @@ const httpRequestTimer = new promClient.Histogram({
 });
 register.registerMetric(httpRequestTimer);
 
-// Prometheus metrics endpoint
+// Metrics Endpoint
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);
   res.end(await register.metrics());
 });
 
-// Middleware
-// 1. Security Headers
-app.use(helmet());
+// Middleware Stack
+app.use(helmet()); 
+app.use(xss());    
+app.use(compression()); 
+app.use('/api/', apiLimiter); 
 
-// 2. Data Sanitization (NoSQL injection & XSS prevention)
-app.use(xss());
-
-// 3. Rate Limiting (Applied strictly to /api)
-app.use('/api/', apiLimiter);
-
-// 4. Request Logging to Winston & metrics tracking
+// Request Logging & Metrics Tracking
 app.use((req, res, next) => {
   const startEpoch = Date.now();
   res.on('finish', () => {
@@ -56,156 +52,146 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware
+// CORS Configuration (Hardened)
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000'].filter(Boolean);
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (origin.includes('localhost') || origin.includes('vercel.app') || origin === process.env.FRONTEND_URL) {
-      return callback(null, true);
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS blocked request from: ${origin}`);
+      callback(new Error('Not allowed by CORS Policy'));
     }
-    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-auth-token']
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Mock Redis removed - logic mapped to middleware/cache.js natively
+app.use(express.json({ limit: '1mb' })); 
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// Connect to MongoDB
+// MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/mdm_system';
 mongoose.connect(MONGO_URI)
   .then(async () => {
-    console.log('✅ Connected to MongoDB');
+    logger.info('✅ Connected to MongoDB');
     try {
       const User = require('./models/User');
-      const adminCount = await User.countDocuments({ role: 'admin' });
-      if (adminCount === 0) {
+      const adminEmail = process.env.INITIAL_ADMIN_EMAIL || 'admin@mdmportal.com';
+      const adminExists = await User.findOne({ email: adminEmail });
+      if (!adminExists) {
         await User.create({
           name: 'System Administrator',
-          email: 'admin@mdmportal.com',
-          password: 'adminPassword123!',
+          email: adminEmail,
+          password: process.env.INITIAL_ADMIN_PASSWORD || 'ChangeMeImmediately123!',
           role: 'admin',
           isActive: true
         });
-        console.log('🎉 Default admin created: admin@mdmportal.com');
+        logger.warn(`🎉 Default admin created: ${adminEmail}. PLEASE CHANGE PASSWORD.`);
       }
     } catch (e) {
-      console.error('⚠️ Failed to seed default admin:', e.message);
+      logger.error(`⚠️ Seed error: ${e.message}`);
     }
   })
   .catch(err => {
-    console.log('❌ MongoDB connection error:', err.message);
+    logger.error(`❌ MongoDB error: ${err.message}`);
     process.exit(1);
   });
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const deviceRoutes = require('./routes/devices');
-const versionRoutes = require('./routes/versions');
-const scheduleRoutes = require('./routes/schedules');
-const updateRoutes = require('./routes/updates');
-const auditRoutes = require('./routes/audit');
-const statsRoutes = require('./routes/stats');
-const userRoutes = require('./routes/users');
+// Route Registration
+const routes = {
+  auth: require('./routes/auth'),
+  devices: require('./routes/devices'),
+  versions: require('./routes/versions'),
+  schedules: require('./routes/schedules'),
+  updates: require('./routes/updates'),
+  audit: require('./routes/audit'),
+  stats: require('./routes/stats'),
+  users: require('./routes/users')
+};
 
-// Use routes
-app.use('/api/auth', authRoutes);
-app.use('/api/devices', deviceRoutes);
-app.use('/api/versions', versionRoutes);
-app.use('/api/schedules', scheduleRoutes);
-app.use('/api/updates', updateRoutes);
-app.use('/api/audit', auditRoutes);
-app.use('/api/stats', statsRoutes);
-app.use('/api/users', userRoutes);
+Object.entries(routes).forEach(([path, handler]) => {
+  app.use(`/api/${path}`, handler);
+});
 
-// Health check endpoint
+// Health Check
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
-    timestamp: new Date().toISOString(),
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    redis: 'mock mode'
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
-// Test endpoint
-app.get('/api/test', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'Backend API is working!',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Add this temporary test endpoint
-app.post('/api/test-bcrypt', async (req, res) => {
-  const bcrypt = require('bcryptjs');
-  const { password, hash } = req.body;
-  
-  try {
-    const isMatch = await bcrypt.compare(password, hash);
-    res.json({ 
-      success: true, 
-      isMatch,
-      password,
-      hashPreview: hash.substring(0, 20) + '...'
-    });
-  } catch (error) {
-    res.json({ success: false, error: error.message });
-  }
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    error: 'Route not found',
-    path: req.path 
-  });
-});
-
-// Error handler
+// Error Handling
+app.use((req, res) => res.status(404).json({ success: false, error: 'Route not found' }));
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    success: false, 
-    error: 'Internal server error',
-    message: err.message 
-  });
+  logger.error(err.stack);
+  res.status(err.status || 500).json({ success: false, error: 'Internal Server Error' });
 });
 
 const PORT = process.env.PORT || 5000;
 const httpServer = http.createServer(app);
 
-// Initialize Socket.io
+// Hardened Socket.io Configuration with Auth Middleware
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST']
   }
 });
 
+const jwt = require('jsonwebtoken');
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error('Authentication error: No token provided'));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = decoded.user;
+    next();
+  } catch (err) {
+    return next(new Error('Authentication error: Invalid token'));
+  }
+});
+
 io.on('connection', (socket) => {
-  logger.info(`🔌 WebSocket Client connected: ${socket.id}`);
-  
+  logger.info(`🔌 Socket connected: ${socket.id} (User: ${socket.user.email})`);
+
+  // Join rooms based on role for targeted broadcasting
+  socket.join(`user:${socket.user.id}`);
+  if (socket.user.role === 'admin' || socket.user.role === 'manager') {
+    socket.join('staff');
+  }
+  if (socket.user.role === 'admin') {
+    socket.join('admin');
+  }
+
   socket.on('disconnect', () => {
-    logger.info(`🔌 WebSocket Client disconnected: ${socket.id}`);
+    logger.info(`🔌 Socket disconnected: ${socket.id}`);
   });
 });
 
-// Expose io locally to all req instances within Express routes
 app.set('io', io);
 
+
+// Graceful Shutdown Logic
+const shutdown = () => {
+  logger.info('Graceful shutdown initiated...');
+  httpServer.close(() => {
+    logger.info('HTTP server closed.');
+    mongoose.connection.close(false, () => {
+      logger.info('MongoDB connection closed.');
+      process.exit(0);
+    });
+  });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
+
 httpServer.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`📡 WebSockets Active`);
-  console.log(`📝 Test the API:`);
-  console.log(`   - Health check: http://localhost:${PORT}/health`);
-  console.log(`   - Test route: http://localhost:${PORT}/api/test`);
-  console.log(`   - Login: POST http://localhost:${PORT}/api/auth/login`);
-  console.log(`   - Device heartbeat: POST http://localhost:${PORT}/api/devices/heartbeat`);
-});
+  logger.info(`✅ Server running on port ${PORT}`);
+});

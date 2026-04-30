@@ -1,20 +1,24 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    trim: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email address']
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    minlength: 8
   },
   role: {
     type: String,
@@ -27,17 +31,16 @@ const userSchema = new mongoose.Schema({
   },
   twoFactorSecret: {
     type: String,
-    default: null
+    default: null,
+    select: false // Security: Don't return secret by default
   },
   twoFactorEnabled: {
     type: Boolean,
     default: false
   },
-  lastLogin: Date,
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  lastLogin: Date
+}, {
+  timestamps: true // Automatically handles createdAt and updatedAt
 });
 
 // Hash password before saving
@@ -45,7 +48,7 @@ userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
   try {
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12); // Slightly higher rounds for enterprise security
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {

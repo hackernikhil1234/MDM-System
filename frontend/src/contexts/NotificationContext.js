@@ -119,9 +119,10 @@ export const NotificationProvider = ({ children }) => {
     const interval = setInterval(fetchNotifications, 30000);
 
     // Initialize WebSockets globally for instant payloads
-    const socketService = new SocketService();
     const token = localStorage.getItem('token');
-    if (token) socketService.connect(token);
+    if (token && !SocketService.socket) {
+      SocketService.connect(token);
+    }
 
     // Receive the WebSocket hook we built backend side
     const handleAdminCommand = (data) => {
@@ -136,14 +137,14 @@ export const NotificationProvider = ({ children }) => {
       }, ...prev].slice(0, 20));
     };
 
-    socketService.subscribe('admin_command', handleAdminCommand);
+    SocketService.subscribe('admin_command', handleAdminCommand);
 
     return () => {
       clearInterval(interval);
-      socketService.unsubscribe('admin_command', handleAdminCommand);
-      if (socketService.socket) socketService.socket.disconnect();
+      SocketService.unsubscribe('admin_command', handleAdminCommand);
     };
   }, [user]);
+
 
   const markAsRead = (notificationId) => {
     setNotifications(prev => 
