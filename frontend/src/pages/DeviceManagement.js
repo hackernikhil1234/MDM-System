@@ -58,14 +58,13 @@ import {
   ClearAll as ClearAllIcon,
   GetApp as GetAppIcon,
   MoreVert as MoreVertIcon,
-} from '@mui/icons-material';
-
-const ORANGE = '#FF6B35';
   ViewModule as ViewModuleIcon,
   ViewList as ViewListIcon,
   Update as UpdateIcon,
   History as HistoryIcon,
 } from '@mui/icons-material';
+
+const ORANGE = '#FF6B35';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';

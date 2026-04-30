@@ -58,7 +58,6 @@ import { useNavigate } from 'react-router-dom';
 import GlobalMap from '../components/GlobalMap';
 import PageTransition from '../components/PageTransition';
 
-const ORANGE = '#FF6B35';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { motion } from 'framer-motion';
 
