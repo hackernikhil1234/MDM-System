@@ -35,11 +35,39 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-// Middleware Stack
-app.use(helmet()); 
-app.use(xss());    
-app.use(compression()); 
-app.use('/api/', apiLimiter); 
+// ─── CORS must be registered FIRST, before any security middleware ───────────
+// CORS Configuration — supports comma-separated FRONTEND_URL for multi-origin setups
+const rawOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...rawOrigins, 'http://localhost:3000'])];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS blocked request from: ${origin}`);
+      callback(new Error(`CORS: Origin ${origin} is not allowed`));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'x-auth-token', 'Authorization'],
+  optionsSuccessStatus: 200
+};
+
+// Respond immediately to all OPTIONS preflight requests
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
+
+// ─── Security & Compression ───────────────────────────────────────────────────
+app.use(helmet());
+app.use(xss());
+app.use(compression());
+app.use('/api/', apiLimiter);
 
 // Request Logging & Metrics Tracking
 app.use((req, res, next) => {
@@ -52,24 +80,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS Configuration (Hardened)
-const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000'].filter(Boolean);
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      logger.warn(`CORS blocked request from: ${origin}`);
-      callback(new Error('Not allowed by CORS Policy'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-auth-token']
-}));
-
-app.use(express.json({ limit: '1mb' })); 
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/mdm_system';
