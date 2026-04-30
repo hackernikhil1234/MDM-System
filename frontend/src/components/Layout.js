@@ -20,7 +20,6 @@ import {
   alpha,
 } from '@mui/material';
 
-const ORANGE = '#FF6B35';
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
@@ -47,6 +46,8 @@ import { useNotifications } from '../contexts/NotificationContext';
 import SearchBar from './SearchBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+
+const ORANGE = '#FF6B35';
 
 
 const drawerWidth = 270;

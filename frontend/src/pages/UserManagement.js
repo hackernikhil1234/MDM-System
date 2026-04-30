@@ -7,7 +7,6 @@ import {
   Card, CardContent, Grid, alpha,
 } from '@mui/material';
 
-const ORANGE = '#FF6B35';
 import {
   PersonAdd as PersonAddIcon,
   Delete as DeleteIcon,
@@ -28,6 +27,8 @@ import { motion } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
+
+const ORANGE = '#FF6B35';
 
 const roleColors = {
   admin: { bg: 'rgba(255,107,53,0.08)', text: '#FF6B35', border: 'rgba(255,107,53,0.3)', icon: <AdminIcon sx={{ fontSize: 14 }} /> },
