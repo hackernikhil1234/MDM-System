@@ -17,7 +17,10 @@ import {
   Badge,
   Tooltip,
   Chip,
+  alpha,
 } from '@mui/material';
+
+const ORANGE = '#FF6B35';
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,

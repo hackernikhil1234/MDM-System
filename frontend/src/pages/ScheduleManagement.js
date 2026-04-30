@@ -262,9 +262,6 @@ function ScheduleManagement() {
     cancelled: scheduleList.filter(s => s.status === 'cancelled').length,
   };
 
-  return (
-    <PageTransition>
-      <Box sx={{ flexGrow: 1 }}>
   const ORANGE = '#FF6B35';
 
   return (

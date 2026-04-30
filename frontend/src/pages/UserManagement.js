@@ -358,7 +358,7 @@ export default function UserManagement() {
             </Table>
           </TableContainer>
         )}
-      </Paper>
+      </Card>
 
       {/* Role Change Dialog */}
       <Dialog 
