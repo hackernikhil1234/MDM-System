@@ -62,13 +62,11 @@ export default function UserManagement() {
   const [inviteForm, setInviteForm] = useState({ name: '', email: '', password: '', role: 'viewer', organization: '' });
   const [inviteLoading, setInviteLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
-  const headers = { 'x-auth-token': token };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/users', { headers });
+      const res = await api.get('/users');
       setUsers(res.data.users || []);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to load users');
@@ -87,7 +85,7 @@ export default function UserManagement() {
 
   const handleToggle = async (userId) => {
     try {
-      const res = await api.put(`/users/${userId}/toggle`, {}, { headers });
+      const res = await api.put(`/users/${userId}/toggle`, {});
       setUsers(prev => prev.map(u => u._id === userId ? { ...u, isActive: res.data.user.isActive } : u));
       setSuccess('User status updated');
       setTimeout(() => setSuccess(''), 3000);
@@ -98,7 +96,7 @@ export default function UserManagement() {
 
   const handleRoleChange = async () => {
     try {
-      const res = await api.put(`/users/${roleDialog._id}/role`, { role: newRole }, { headers });
+      const res = await api.put(`/users/${roleDialog._id}/role`, { role: newRole });
       setUsers(prev => prev.map(u => u._id === roleDialog._id ? { ...u, role: res.data.user.role } : u));
       setRoleDialog(null);
       setSuccess('Role updated successfully');
@@ -111,7 +109,7 @@ export default function UserManagement() {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      await api.delete(`/users/${deleteDialog._id}`, { headers });
+      await api.delete(`/users/${deleteDialog._id}`);
       setUsers(prev => prev.filter(u => u._id !== deleteDialog._id));
       setDeleteDialog(null);
       setSuccess('User deleted successfully');
@@ -126,20 +124,16 @@ export default function UserManagement() {
   const handleInvite = async () => {
     setInviteLoading(true);
     try {
-      const res = await api.post('/auth/register', inviteForm);
+      const res = await api.post('/users', inviteForm);
       if (res.data.success) {
-        // Update the role if not viewer
-        if (inviteForm.role !== 'viewer') {
-          await api.put(`/users/${res.data.user.id}/role`, { role: inviteForm.role }, { headers });
-        }
         setInviteDialog(false);
         setInviteForm({ name: '', email: '', password: '', role: 'viewer', organization: '' });
         fetchUsers();
-        setSuccess('User invited successfully');
+        setSuccess('Operator enrolled successfully');
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to invite user');
+      setError(err.response?.data?.error || 'Failed to enroll personnel');
     } finally {
       setInviteLoading(false);
     }

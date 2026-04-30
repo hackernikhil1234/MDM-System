@@ -38,6 +38,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  organization: {
+    type: String,
+    trim: true,
+    default: 'MDMCORE'
+  },
   lastLogin: Date
 }, {
   timestamps: true // Automatically handles createdAt and updatedAt

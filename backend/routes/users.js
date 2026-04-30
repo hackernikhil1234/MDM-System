@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 const auth = require('../middleware/auth');
+const { validateUserCreate } = require('../middleware/validators');
 
 // Admin-only middleware
 const adminOnly = (req, res, next) => {
@@ -17,6 +18,31 @@ router.get('/', auth, adminOnly, async (req, res) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
     res.json({ success: true, users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/users — Create a new user (admin only)
+router.post('/', auth, adminOnly, validateUserCreate, async (req, res) => {
+  try {
+    const { name, email, password, role, organization } = req.body;
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ success: false, error: 'User already exists' });
+    }
+
+    const user = new User({
+      name,
+      email: email.toLowerCase(),
+      password,
+      role: role || 'viewer',
+      organization: organization || 'MDMCORE'
+    });
+
+    await user.save();
+    res.status(201).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

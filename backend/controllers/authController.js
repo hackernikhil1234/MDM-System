@@ -56,7 +56,8 @@ exports.register = async (req, res) => {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password,
-      role: 'viewer'
+      role: 'viewer',
+      organization: req.body.organization || 'MDMCORE'
     });
 
     await user.save();
