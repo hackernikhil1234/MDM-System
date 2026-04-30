@@ -4,8 +4,10 @@ import {
   TableHead, TableRow, Chip, IconButton, Button, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, MenuItem, Select, FormControl,
   InputLabel, Alert, Avatar, Tooltip, Switch, CircularProgress, InputAdornment,
-  Card, CardContent, Grid,
+  Card, CardContent, Grid, alpha,
 } from '@mui/material';
+
+const ORANGE = '#FF6B35';
 import {
   PersonAdd as PersonAddIcon,
   Delete as DeleteIcon,
@@ -20,6 +22,7 @@ import {
   Person as PersonIcon,
   Email as EmailIcon,
   Lock as LockIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import api from '../services/api';
