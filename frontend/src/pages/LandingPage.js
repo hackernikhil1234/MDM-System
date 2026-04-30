@@ -12,6 +12,8 @@ import {
   IconButton,
   alpha,
   Divider,
+  Card,
+  CardContent,
 } from '@mui/material';
 import {
   Devices as DevicesIcon,

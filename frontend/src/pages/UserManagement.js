@@ -150,9 +150,6 @@ export default function UserManagement() {
   ];
 
   return (
-  const ORANGE = '#FF6B35';
-
-  return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Premium Header */}
       <Box

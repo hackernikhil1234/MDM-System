@@ -371,7 +371,11 @@ function Dashboard() {
                       </TableRow>
                     ))}
                     {recentJobs.length === 0 && (
-                      <TableRow><TableCell colSpan={4} align="center" sx={{ py: 6, color: 'rgba(255,255,255,0.1)', fontStyle: 'italic', border: 0 }}>No active telemetry streams detected</Typography></TableCell></TableRow>
+                      <TableRow>
+                        <TableCell colSpan={4} align="center" sx={{ py: 6, color: 'rgba(255,255,255,0.1)', fontStyle: 'italic', border: 0 }}>
+                          No active telemetry streams detected
+                        </TableCell>
+                      </TableRow>
                     )}
                   </TableBody>
                 </Table>

@@ -500,9 +500,6 @@ function Layout({ children }) {
         </Toolbar>
       </AppBar>
 
-        </Toolbar>
-      </AppBar>
-
       {/* Sidebar */}
       <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
         <Drawer

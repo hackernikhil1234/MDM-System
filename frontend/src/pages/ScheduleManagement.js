@@ -569,7 +569,7 @@ function ScheduleManagement() {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        </Card>
 
         {/* Create Schedule Dialog */}
         <Dialog 
