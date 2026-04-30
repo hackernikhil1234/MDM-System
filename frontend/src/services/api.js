@@ -141,6 +141,7 @@ export const schedules = {
 };
 
 export const updates = {
+  getAllJobs: (params) => api.get('/updates', { params }),
   getDeviceJobs: (imei) => api.get(`/updates/device/${imei}/pending`),
   getDeviceHistory: (imei) => api.get(`/updates/device/${imei}/history`),
   getJob: (jobId) => api.get(`/updates/job/${jobId}`),

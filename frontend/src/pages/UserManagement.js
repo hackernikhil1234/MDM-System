@@ -167,7 +167,7 @@ export default function UserManagement() {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3, position: 'relative', zIndex: 1 }}>
           <Box>
             <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mb: 1, letterSpacing: '-0.03em' }}>
-              Personnel Directory
+              Personnel Management
             </Typography>
             <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.95rem', fontWeight: 500 }}>
               Oversee administrative access and manage team permissions
@@ -235,7 +235,7 @@ export default function UserManagement() {
               } 
             }}
           />
-          <Chip label={`${filteredUsers.length} Operators Enrolled`} sx={{ bgcolor: alpha(ORANGE, 0.1), color: ORANGE, fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase' }} />
+          <Chip label={`${filteredUsers.length} Personnel Enrolled`} sx={{ bgcolor: alpha(ORANGE, 0.1), color: ORANGE, fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase' }} />
         </Box>
 
 

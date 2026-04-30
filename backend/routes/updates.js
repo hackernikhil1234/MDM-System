@@ -109,6 +109,24 @@ router.get('/job/:jobId', auth, async (req, res) => {
   }
 });
 
+// Get all recent jobs (Admin/Manager only)
+router.get('/', auth, async (req, res) => {
+  try {
+    const { limit = 50, state } = req.query;
+    const query = {};
+    if (state) query.currentState = state;
+
+    const jobs = await UpdateJob.find(query)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .populate('scheduleId');
+
+    res.json({ success: true, jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get device update history
 router.get('/device/:imei/history', auth, async (req, res) => {
   try {

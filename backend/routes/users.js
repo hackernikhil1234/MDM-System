@@ -55,11 +55,11 @@ router.put('/:id/role', auth, adminOnly, async (req, res) => {
     if (!['admin', 'manager', 'viewer'].includes(role)) {
       return res.status(400).json({ success: false, error: 'Invalid role' });
     }
-    if (req.params.id === req.user.id.toString()) {
-      return res.status(400).json({ success: false, error: 'Cannot change your own role' });
-    }
+    const previousUser = await User.findById(req.params.id);
+    if (!previousUser) return res.status(404).json({ success: false, error: 'User not found' });
+    
+    const previousRole = previousUser.role;
     const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }).select('-password');
-    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
 
     try {
       await AuditLog.create({
@@ -69,7 +69,7 @@ router.put('/:id/role', auth, adminOnly, async (req, res) => {
         entityName: user.name,
         userId: req.user.id,
         userName: req.user.name,
-        changes: { role, previousRole: req.body.previousRole },
+        changes: { role, previousRole },
       });
     } catch (e) { /* non-fatal */ }
 
@@ -93,7 +93,7 @@ router.put('/:id/toggle', auth, adminOnly, async (req, res) => {
 
     try {
       await AuditLog.create({
-        action: user.isActive ? 'USER_CREATED' : 'USER_UPDATED',
+        action: user.isActive ? 'USER_ACTIVATED' : 'USER_DEACTIVATED',
         entityType: 'user',
         entityId: user.id,
         entityName: user.name,

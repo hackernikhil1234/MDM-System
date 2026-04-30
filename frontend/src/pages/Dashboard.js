@@ -116,10 +116,10 @@ function Dashboard() {
       const schedulesRes = await schedules.getAll({ limit: 5 });
       setRecentSchedules(schedulesRes.data?.schedules || []);
 
-      // Recent jobs — non-critical, silently skip if API doesn't support it
+      // Recent jobs — fetch globally for live operations manifest
       try {
-        const jobsRes = await updates.getDeviceHistory?.('all');
-        setRecentJobs(jobsRes?.data?.jobs || []);
+        const jobsRes = await updates.getAllJobs({ limit: 10 });
+        setRecentJobs(jobsRes.data?.jobs || []);
       } catch (_) {
         setRecentJobs([]);
       }
@@ -398,7 +398,6 @@ function Dashboard() {
           <MenuItem onClick={() => { setTimeRange('30d'); setAnchorEl(null); }}><ListItemText>Last 30 Days</ListItemText></MenuItem>
         </Menu>
       </Box>
-    </Box>
   );
 }
 
