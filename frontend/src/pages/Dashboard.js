@@ -15,13 +15,11 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Divider,
   Card,
   CardContent,
   alpha,
   Menu,
   MenuItem,
-  ListItemIcon,
   ListItemText,
 } from '@mui/material';
 import {
@@ -33,11 +31,8 @@ import {
   Download as DownloadIcon,
   Speed as SpeedIcon,
   Timeline as TimelineIcon,
-  BarChart as BarChartIcon,
 } from '@mui/icons-material';
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   PieChart,
@@ -47,7 +42,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 
@@ -56,7 +50,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import GlobalMap from '../components/GlobalMap';
-import PageTransition from '../components/PageTransition';
+
 
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { motion } from 'framer-motion';
@@ -100,7 +94,6 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState('7d');
-  const [selectedChart, setSelectedChart] = useState('line');
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -112,25 +105,39 @@ function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+
+      // Core device stats
       const devicesRes = await devices.getAll({ limit: 10 });
       const devicesData = devicesRes.data;
-      setStats(devicesData.stats);
+      setStats(devicesData.stats || {});
       if (devicesData.stats?.versionDistribution) setVersionData(devicesData.stats.versionDistribution);
 
+      // Recent schedules
       const schedulesRes = await schedules.getAll({ limit: 5 });
-      setRecentSchedules(schedulesRes.data.schedules);
+      setRecentSchedules(schedulesRes.data?.schedules || []);
 
-      const jobsRes = await updates.getRecentJobs?.() || { data: { jobs: [] } };
-      setRecentJobs(jobsRes.data.jobs || []);
+      // Recent jobs — non-critical, silently skip if API doesn't support it
+      try {
+        const jobsRes = await updates.getDeviceHistory?.('all');
+        setRecentJobs(jobsRes?.data?.jobs || []);
+      } catch (_) {
+        setRecentJobs([]);
+      }
 
+      // Audit telemetry for charts
       const endDate = new Date();
       const startDate = subDays(endDate, parseInt(timeRange));
-      const auditRes = await audit.getLogs({ startDate: startDate.toISOString(), endDate: endDate.toISOString(), limit: 1000 });
-      processAuditStats(auditRes.data.logs);
+      const auditRes = await audit.getLogs({
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        limit: 500
+      });
+      processAuditStats(auditRes.data?.logs || []);
 
       setError(null);
-    } catch (error) {
-      setError('System: Failed to synchronize live metrics');
+    } catch (err) {
+      console.error('[Dashboard] Fetch error:', err);
+      setError('Failed to synchronize live metrics. Backend may be starting up.');
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import theme from './theme';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -20,135 +21,50 @@ import UserManagement from './pages/UserManagement';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import Layout from './components/Layout';
-import PageTransition from './components/PageTransition';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import { useAuth } from './contexts/AuthContext';
 
-// Protected Route Component
+// ── Protected Route ────────────────────────────────────────────────────────────
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
-  
-  if (loading) {
-    return <LoadingSkeleton type="dashboard" />;
-  }
-  
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
 
+  if (loading) return <LoadingSkeleton type="dashboard" />;
+  if (!user) return <Navigate to="/login" replace />;
   if (requiredRole && user.role !== 'admin' && user.role !== requiredRole) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/dashboard" replace />;
   }
-  
   return children;
 };
 
+// ── Wrap a page in Layout + its own ErrorBoundary ─────────────────────────────
+const Page = ({ component: Component, requiredRole }) => (
+  <ProtectedRoute requiredRole={requiredRole}>
+    <Layout>
+      <ErrorBoundary>
+        <Component />
+      </ErrorBoundary>
+    </Layout>
+  </ProtectedRoute>
+);
+
+// ── Route Config ───────────────────────────────────────────────────────────────
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
-      {/* Protected routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PageTransition>
-                <Dashboard />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/devices"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PageTransition>
-                <DeviceManagement />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/versions"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Layout>
-              <PageTransition>
-                <VersionManagement />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/schedules"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PageTransition>
-                <ScheduleManagement />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/audit"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Layout>
-              <PageTransition>
-                <AuditTrail />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/analytics"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PageTransition>
-                <Analytics />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/users"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Layout>
-              <PageTransition>
-                <UserManagement />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PageTransition>
-                <Settings />
-              </PageTransition>
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
+
+      {/* Protected */}
+      <Route path="/dashboard"  element={<Page component={Dashboard} />} />
+      <Route path="/devices"    element={<Page component={DeviceManagement} />} />
+      <Route path="/analytics"  element={<Page component={Analytics} />} />
+      <Route path="/versions"   element={<Page component={VersionManagement} requiredRole="admin" />} />
+      <Route path="/schedules"  element={<Page component={ScheduleManagement} />} />
+      <Route path="/audit"      element={<Page component={AuditTrail} requiredRole="admin" />} />
+      <Route path="/users"      element={<Page component={UserManagement} requiredRole="admin" />} />
+      <Route path="/settings"   element={<Page component={Settings} />} />
 
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
@@ -156,18 +72,21 @@ function AppRoutes() {
   );
 }
 
+// ── Root ───────────────────────────────────────────────────────────────────────
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <NotificationProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
-        </NotificationProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <NotificationProvider>
+            <Router>
+              <AppRoutes />
+            </Router>
+          </NotificationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
