@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PageTransition from '../components/PageTransition';
 import {
   Box,
@@ -35,8 +35,6 @@ import {
   Update as UpdateIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
-  Error as ErrorIcon,
-  FilterList as FilterIcon,
   MoreVert as MoreIcon
 } from '@mui/icons-material';
 import { audit } from '../services/api';
@@ -90,11 +88,7 @@ function AuditTrail() {
     direction: 'desc'
   });
 
-  useEffect(() => {
-    fetchLogs();
-  }, [page, rowsPerPage, filters]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -112,7 +106,11 @@ function AuditTrail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, filters]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   const handleSort = (field) => {
     setSortConfig({

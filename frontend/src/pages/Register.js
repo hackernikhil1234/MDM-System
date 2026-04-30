@@ -24,10 +24,7 @@ import {
   Business as BusinessIcon,
   Devices as DevicesIcon,
   ArrowForward as ArrowForwardIcon,
-  ArrowBack as ArrowBackIcon,
-  CheckCircle as CheckCircleIcon,
   Shield as ShieldIcon,
-  Speed as SpeedIcon,
   Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';

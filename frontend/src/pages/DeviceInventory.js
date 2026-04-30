@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PageTransition from '../components/PageTransition';
 import {
   Box, Typography, Table, TableBody, TableCell, TableContainer,
@@ -12,6 +12,7 @@ import {
   PhoneAndroid as PhoneAndroidIcon,
   LocationOn as LocationIcon,
   SignalCellularAlt as SignalIcon,
+  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import api from '../services/api';
 import { format } from 'date-fns';
@@ -28,11 +29,7 @@ function DeviceInventory() {
   const [expandedDevice, setExpandedDevice] = useState(null);
   const [deviceDetails, setDeviceDetails] = useState({});
 
-  useEffect(() => {
-    fetchDevices();
-  }, [page, rowsPerPage, searchTerm]);
-
-  const fetchDevices = async () => {
+  const fetchDevices = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get('/devices', { params: { page: page + 1, limit: rowsPerPage, search: searchTerm } });
@@ -41,7 +38,11 @@ function DeviceInventory() {
     } catch (error) {
       console.error('Error fetching devices:', error);
     } finally { setLoading(false); }
-  };
+  }, [page, rowsPerPage, searchTerm]);
+
+  useEffect(() => {
+    fetchDevices();
+  }, [fetchDevices]);
 
   const fetchDeviceDetails = async (imei) => {
     try {

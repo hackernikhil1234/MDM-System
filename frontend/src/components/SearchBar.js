@@ -25,14 +25,6 @@ function SearchBar({ open, onClose }) {
     if (!open) { setQuery(''); setResults({ devices: [], schedules: [], versions: [] }); }
   }, [open]);
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (query.length > 1) performSearch();
-      else setResults({ devices: [], schedules: [], versions: [] });
-    }, 300);
-    return () => clearTimeout(delayDebounce);
-  }, [query]);
-
   const performSearch = useCallback(async () => {
     setLoading(true);
     try {
@@ -49,6 +41,14 @@ function SearchBar({ open, onClose }) {
     } catch (err) { console.error('Search error:', err); }
     finally { setLoading(false); }
   }, [query]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query.length > 1) performSearch();
+      else setResults({ devices: [], schedules: [], versions: [] });
+    }, 300);
+    return () => clearTimeout(delayDebounce);
+  }, [query, performSearch]);
 
   const handleNavigate = (type, item) => {
     onClose();

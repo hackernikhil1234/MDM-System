@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Grid,
   Typography,
   Box,
-  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -13,7 +12,6 @@ import {
   Chip,
   Alert,
   IconButton,
-  Tooltip,
   Button,
   Card,
   CardContent,
@@ -83,7 +81,7 @@ const KPICard = ({ title, value, icon, color, subtitle, trend }) => (
 );
 
 function Dashboard() {
-  const { user } = useAuth();
+  useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recentSchedules, setRecentSchedules] = useState([]);
@@ -96,54 +94,7 @@ function Dashboard() {
   const [timeRange, setTimeRange] = useState('7d');
   const [anchorEl, setAnchorEl] = useState(null);
 
-  useEffect(() => {
-    fetchDashboardData();
-    const interval = setInterval(fetchDashboardData, 60000);
-    return () => clearInterval(interval);
-  }, [timeRange]);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-
-      // Core device stats
-      const devicesRes = await devices.getAll({ limit: 10 });
-      const devicesData = devicesRes.data;
-      setStats(devicesData.stats || {});
-      if (devicesData.stats?.versionDistribution) setVersionData(devicesData.stats.versionDistribution);
-
-      // Recent schedules
-      const schedulesRes = await schedules.getAll({ limit: 5 });
-      setRecentSchedules(schedulesRes.data?.schedules || []);
-
-      // Recent jobs — fetch globally for live operations manifest
-      try {
-        const jobsRes = await updates.getAllJobs({ limit: 10 });
-        setRecentJobs(jobsRes.data?.jobs || []);
-      } catch (_) {
-        setRecentJobs([]);
-      }
-
-      // Audit telemetry for charts
-      const endDate = new Date();
-      const startDate = subDays(endDate, parseInt(timeRange));
-      const auditRes = await audit.getLogs({
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        limit: 500
-      });
-      processAuditStats(auditRes.data?.logs || []);
-
-      setError(null);
-    } catch (err) {
-      console.error('[Dashboard] Fetch error:', err);
-      setError('Failed to synchronize live metrics. Backend may be starting up.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const processAuditStats = (logs) => {
+  const processAuditStats = useCallback((logs) => {
     const days = parseInt(timeRange);
     const data = [];
     const today = new Date();
@@ -166,7 +117,48 @@ function Dashboard() {
     const total = data.reduce((acc, d) => acc + d.updates, 0);
     const errors = data.reduce((acc, d) => acc + d.errors, 0);
     setUpdateTrends({ successRate: total === 0 ? 100 : Math.round(((total - errors) / total) * 100) });
-  };
+  }, [timeRange]);
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const [devicesRes, schedulesRes, updatesRes, auditLogsRes] = await Promise.all([
+        devices.getAll({ limit: 10 }),
+        schedules.getAll({ limit: 5 }),
+        updates.getAllJobs({ limit: 10 }),
+        audit.getLogs({
+          startDate: subDays(new Date(), parseInt(timeRange)).toISOString(),
+          endDate: new Date().toISOString(),
+          limit: 500
+        })
+      ]);
+
+      const devicesData = devicesRes.data;
+      setStats(devicesData.stats || {});
+      if (devicesData.stats?.versionDistribution) {
+        setVersionData(devicesData.stats.versionDistribution);
+      }
+
+      setRecentSchedules(schedulesRes.data?.schedules || []);
+      setRecentJobs(updatesRes.data?.jobs || []);
+      
+      processAuditStats(auditLogsRes.data?.logs || []);
+
+      setError(null);
+    } catch (err) {
+      console.error('[Dashboard] Fetch error:', err);
+      setError('Telemetry Failure: Dashboard sync interrupted');
+    } finally {
+      setLoading(false);
+    }
+  }, [timeRange, processAuditStats]);
+
+  useEffect(() => {
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 60000);
+    return () => clearInterval(interval);
+  }, [fetchDashboardData]);
 
   const handleExportData = () => {
     const dataStr = JSON.stringify({ stats, recentSchedules, versionData }, null, 2);

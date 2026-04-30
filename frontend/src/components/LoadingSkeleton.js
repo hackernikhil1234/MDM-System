@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Skeleton, alpha } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 
 const glassSx = {
   p: 3,

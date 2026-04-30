@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Grid, Card, CardContent, CircularProgress, Alert,
-  ToggleButtonGroup, ToggleButton, Divider, LinearProgress, alpha, useTheme
+  ToggleButtonGroup, ToggleButton, Divider, LinearProgress
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -76,7 +76,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 
 export default function Analytics() {
-  const theme = useTheme();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

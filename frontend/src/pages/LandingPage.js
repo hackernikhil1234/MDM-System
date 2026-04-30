@@ -6,14 +6,9 @@ import {
   Grid,
   Container,
   Chip,
-  AppBar,
   Toolbar,
-  Avatar,
-  IconButton,
   alpha,
-  Divider,
   Card,
-  CardContent,
 } from '@mui/material';
 import {
   Devices as DevicesIcon,
@@ -22,12 +17,8 @@ import {
   Update as UpdateIcon,
   Analytics as AnalyticsIcon,
   ArrowForward as ArrowForwardIcon,
-  Language as LanguageIcon,
-  Bolt as BoltIcon,
   Public as PublicIcon,
   ChevronRight as ChevronRightIcon,
-  Tune as TuneIcon,
-  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';

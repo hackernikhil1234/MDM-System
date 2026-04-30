@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Typography, Paper, Table, TableBody, TableCell, TableContainer,
+  Box, Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Chip, IconButton, Button, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, MenuItem, Select, FormControl,
   InputLabel, Alert, Avatar, Tooltip, Switch, CircularProgress, InputAdornment,
@@ -21,7 +21,6 @@ import {
   Person as PersonIcon,
   Email as EmailIcon,
   Lock as LockIcon,
-  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import api from '../services/api';

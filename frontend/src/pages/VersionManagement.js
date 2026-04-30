@@ -17,7 +17,6 @@ import {
   LinearProgress,
   Switch,
   FormControlLabel,
-  Tooltip,
   alpha,
   Grid,
   Card,
@@ -29,9 +28,7 @@ import {
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon,
   CheckCircle as CheckCircleIcon,
-  Info as InfoIcon,
   Warning as WarningIcon,
-  Update as UpdateIcon,
   History as HistoryIcon,
 } from '@mui/icons-material';
 import { versions } from '../services/api';

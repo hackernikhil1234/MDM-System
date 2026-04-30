@@ -25,7 +25,6 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Tooltip,
   alpha,
   useTheme,
   Divider,
@@ -38,7 +37,6 @@ import {
   Schedule as ScheduleIcon,
   LocationOn as LocationIcon,
   Warning as WarningIcon,
-  Info as InfoIcon,
   Visibility as VisibilityIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
@@ -155,17 +153,6 @@ function ScheduleManagement() {
     }
   };
 
-  const handleCancelSchedule = async (id) => {
-    try {
-      setLoading(true);
-      await schedules.cancel(id);
-      await fetchData();
-    } catch (error) {
-      setError(error.response?.data?.error || 'Failed to cancel schedule');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getStatusChipStyle = (status) => {
     const styles = {

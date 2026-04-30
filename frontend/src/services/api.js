@@ -109,12 +109,12 @@ api.interceptors.response.use(
   }
 );
 
-export const auth = {
+const auth = {
   login: (email, password) => api.post('/auth/login', { email, password }),
   verify: () => api.get('/auth/verify'),
 };
 
-export const devices = {
+const devices = {
   getAll: (params) => api.get('/devices', { params }),
   getOne: (imei) => api.get(`/devices/${imei}`),
   heartbeat: (data) => api.post('/devices/heartbeat', data),
@@ -122,7 +122,7 @@ export const devices = {
   bulkUpdate: (deviceIds, targetVersionCode) => api.post('/devices/bulk-update', { deviceIds, targetVersionCode }),
 };
 
-export const versions = {
+const versions = {
   getAll: () => api.get('/versions'),
   create: (data) => api.post('/versions', data),
   getLatest: () => api.get('/versions/latest'),
@@ -130,7 +130,7 @@ export const versions = {
   delete: (versionCode) => api.delete(`/versions/${versionCode}`),
 };
 
-export const schedules = {
+const schedules = {
   getAll: (params) => api.get('/schedules', { params }),
   getOne: (id) => api.get(`/schedules/${id}`),
   create: (data) => api.post('/schedules', data),
@@ -140,7 +140,7 @@ export const schedules = {
   delete: (id) => api.delete(`/schedules/${id}`),
 };
 
-export const updates = {
+const updates = {
   getAllJobs: (params) => api.get('/updates', { params }),
   getDeviceJobs: (imei) => api.get(`/updates/device/${imei}/pending`),
   getDeviceHistory: (imei) => api.get(`/updates/device/${imei}/history`),
@@ -148,10 +148,11 @@ export const updates = {
   simulateProgress: (jobId, action) => api.post(`/updates/simulate/${jobId}`, { action }),
 };
 
-export const audit = {
+const audit = {
   getLogs: (params) => api.get('/audit', { params }),
   getDeviceTimeline: (imei) => api.get(`/audit/device/${imei}`),
   getScheduleTimeline: (scheduleId) => api.get(`/audit/schedule/${scheduleId}`),
 };
 
+export { auth, devices, versions, schedules, updates, audit };
 export default api;

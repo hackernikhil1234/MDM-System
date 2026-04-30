@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Box, Typography, Grid, Card, CardContent, TextField, Button,
   Switch, Divider, Alert, Chip, InputAdornment,
-  IconButton, CircularProgress, Avatar, List, ListItem,
+  IconButton, Avatar, List, ListItem,
   ListItemText, ListItemSecondaryAction, alpha,
 } from '@mui/material';
 import {
@@ -10,7 +10,6 @@ import {
   Visibility, VisibilityOff,
   Notifications as NotificationsIcon,
   Security as SecurityIcon,
-  Info as InfoIcon,
   Save as SaveIcon,
   CheckCircle as CheckCircleIcon,
   Person as PersonIcon,

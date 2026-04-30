@@ -8,7 +8,6 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
-  Divider,
   Chip,
   alpha,
 } from '@mui/material';
@@ -18,8 +17,6 @@ import {
   Email as EmailIcon,
   Lock as LockIcon,
   Devices as DevicesIcon,
-  ArrowForward as ArrowForwardIcon,
-  CheckCircle as CheckCircleIcon,
   Shield as ShieldIcon,
   Speed as SpeedIcon,
   Analytics as AnalyticsIcon,
@@ -38,7 +35,7 @@ function Login() {
   const [step, setStep] = useState('login');
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [userId, setUserId] = useState(null);
-  const { login, verify2FA, loading, error, clearError } = useAuth();
+  const { login, verify2FA, loading, error } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

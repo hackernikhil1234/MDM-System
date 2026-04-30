@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -10,7 +10,6 @@ import {
   TableRow,
   TablePagination,
   TextField,
-  InputAdornment,
   Chip,
   IconButton,
   Collapse,
@@ -19,13 +18,7 @@ import {
   CardContent,
   LinearProgress,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Alert,
-  Tooltip,
-  Avatar,
   Divider,
   Popover,
   FormControlLabel,
@@ -33,10 +26,7 @@ import {
   Radio,
   RadioGroup,
   FormGroup,
-  Badge,
-  Skeleton,
   alpha,
-  useTheme,
   MenuItem,
 } from '@mui/material';
 import {
@@ -44,36 +34,20 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   PhoneAndroid as PhoneAndroidIcon,
-  Block as BlockIcon,
   Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
   Schedule as ScheduleIcon,
-  Upload as UploadIcon,
-  Info as InfoIcon,
   LocationOn as LocationIcon,
-  BatteryFull as BatteryIcon,
-  NetworkCheck as NetworkIcon,
   FilterList as FilterListIcon,
-  ClearAll as ClearAllIcon,
   GetApp as GetAppIcon,
-  MoreVert as MoreVertIcon,
   ViewModule as ViewModuleIcon,
   ViewList as ViewListIcon,
   Update as UpdateIcon,
-  History as HistoryIcon,
 } from '@mui/icons-material';
 
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineDot from '@mui/lab/TimelineDot';
-import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
-import { devices, updates, audit, versions } from '../services/api';
+import { devices, updates, audit } from '../services/api';
 import { format, formatDistance } from 'date-fns';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
 import EmptyState from '../components/EmptyState';
 import StyledDialog from '../components/StyledDialog';
@@ -112,16 +86,13 @@ function DeviceManagement() {
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [expandedDevice, setExpandedDevice] = useState(null);
   const [deviceTimeline, setDeviceTimeline] = useState({});
-  const [deviceJobs, setDeviceJobs] = useState({});
+  const [, setDeviceJobs] = useState({});
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [selectedDevice] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
-  const [selectedDevices, setSelectedDevices] = useState([]);
-  const [bulkActionDialog, setBulkActionDialog] = useState(false);
   const [viewMode, setViewMode] = useState('table');
   const [advancedFilters, setAdvancedFilters] = useState({
     osVersions: [],
@@ -130,11 +101,7 @@ function DeviceManagement() {
     lastSeenDays: '30',
   });
 
-  useEffect(() => {
-    fetchDevices();
-  }, [page, rowsPerPage, searchTerm, filterStatus, advancedFilters]);
-
-  const fetchDevices = async () => {
+  const fetchDevices = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -149,13 +116,16 @@ function DeviceManagement() {
       const response = await devices.getAll(params);
       setDevicesList(response.data.devices);
       setStats(response.data.stats);
-      setError(null);
     } catch (error) {
-      setError('System: Failed to synchronize fleet data');
+      console.error('System: Failed to synchronize fleet data', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, searchTerm, filterStatus, advancedFilters]);
+
+  useEffect(() => {
+    fetchDevices();
+  }, [fetchDevices]);
 
   const fetchDeviceDetails = async (imei) => {
     try {
@@ -186,7 +156,7 @@ function DeviceManagement() {
       setBlockDialogOpen(false);
       fetchDevices();
     } catch (error) {
-      setError('Security: Failed to execute block protocol');
+      console.error('Security: Failed to execute block protocol', error);
     }
   };
 
